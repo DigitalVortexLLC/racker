@@ -126,7 +126,7 @@ const { loadCurrentSite } = useDatabase()
 loadCurrentSite()
 
 // Track unracked panel state
-const unrackedPanelExpanded = ref(true)
+const unrackedPanelExpanded = ref(false)
 provide('unrackedPanelExpanded', unrackedPanelExpanded)
 
 const unrackedPanelWidth = computed(() => {
