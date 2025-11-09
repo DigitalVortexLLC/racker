@@ -56,39 +56,14 @@
           />
         </div>
 
-        <!-- Power Capacity -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
-            Total Power Capacity (Watts)
-          </label>
-        <input
-          v-model.number="localSettings.totalPowerCapacity"
-          type="number"
-          min="0"
-          class="w-full px-3 py-2 rounded focus:outline-none transition-colors"
-          style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);"
-          @focus="$event.target.style.borderColor = 'var(--color-primary)'; $event.target.style.boxShadow = '0 0 0 2px rgba(132, 204, 22, 0.2)'"
-            @blur="$event.target.style.borderColor = 'var(--border-color)'; $event.target.style.boxShadow = 'none'"
-          />
-        </div>
-
-        <!-- HVAC Capacity -->
-        <div class="mb-6">
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
-            HVAC Capacity (Refrigeration Tons)
-          </label>
-        <input
-          v-model.number="localSettings.hvacCapacityTons"
-          type="number"
-          min="0"
-          step="0.1"
-          class="w-full px-3 py-2 rounded focus:outline-none transition-colors"
-          style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);"
-          @focus="$event.target.style.borderColor = 'var(--color-primary)'; $event.target.style.boxShadow = '0 0 0 2px rgba(132, 204, 22, 0.2)'"
-            @blur="$event.target.style.borderColor = 'var(--border-color)'; $event.target.style.boxShadow = 'none'"
-          />
-          <p class="text-xs mt-1" style="color: var(--text-secondary);">
-            Tip: 1 Refrigeration Ton = 12,000 BTU/hr
+        <!-- Resource Providers Note -->
+        <div class="mb-6 p-4 rounded border" style="background-color: rgba(74, 144, 226, 0.1); border-color: var(--color-primary);">
+          <p class="text-sm" style="color: var(--text-primary);">
+            <strong>💡 Power & Cooling Capacity</strong>
+          </p>
+          <p class="text-xs mt-2" style="color: var(--text-secondary);">
+            Capacity is now managed through <strong>Resource Providers</strong>. 
+            Open the Device Manager and go to the "Resource Providers" tab to add PDUs, HVAC units, and other infrastructure that provides capacity to your site.
           </p>
         </div>
 
@@ -119,10 +94,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRackConfig } from '../composables/useRackConfig'
 import { useToast } from '../composables/useToast'
-import { tonsToBtu, btuToTons } from '../utils/calculations'
 
 const emit = defineEmits(['close'])
 
@@ -131,25 +105,19 @@ const { showSuccess } = useToast()
 
 const localSettings = ref({
   numberOfRacks: 1,
-  ruPerRack: 42,
-  totalPowerCapacity: 10000,
-  hvacCapacityTons: 3
+  ruPerRack: 42
 })
 
 onMounted(() => {
   localSettings.value = {
     numberOfRacks: config.value.racks.length || 1,
-    ruPerRack: config.value.settings.ruPerRack,
-    totalPowerCapacity: config.value.settings.totalPowerCapacity,
-    hvacCapacityTons: btuToTons(config.value.settings.hvacCapacity)
+    ruPerRack: config.value.settings.ruPerRack
   }
 })
 
 const saveSettings = () => {
   updateSettings({
-    ruPerRack: localSettings.value.ruPerRack,
-    totalPowerCapacity: localSettings.value.totalPowerCapacity,
-    hvacCapacity: tonsToBtu(localSettings.value.hvacCapacityTons)
+    ruPerRack: localSettings.value.ruPerRack
   })
 
   // Update number of racks
