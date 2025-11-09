@@ -16,8 +16,16 @@
 
       <!-- Device info -->
       <div class="flex-1 min-w-0">
-        <div class="font-medium text-sm truncate" style="color: var(--text-primary);">
+        <div class="font-medium text-sm truncate flex items-center gap-2" style="color: var(--text-primary);">
           {{ device.name }}
+          <span
+            v-if="device.custom"
+            class="text-xs px-1.5 py-0.5 rounded"
+            style="background-color: rgba(74, 144, 226, 0.2); color: var(--color-primary);"
+            title="Custom device"
+          >
+            Custom
+          </span>
         </div>
         <div class="text-xs" style="color: var(--text-secondary);">
           {{ device.ruSize }}U • {{ device.powerDraw }}W

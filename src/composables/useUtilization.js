@@ -1,9 +1,11 @@
 import { computed } from 'vue'
 import { useRackConfig } from './useRackConfig'
+import { useResourceProviders } from './useResourceProviders'
 import { calculateHeatLoad } from '../utils/calculations'
 
 export function useUtilization() {
   const { config } = useRackConfig()
+  const { totalPowerCapacity, totalCoolingCapacity } = useResourceProviders()
 
   // Calculate total power used across all racks and unracked devices
   const powerUsed = computed(() => {
@@ -27,6 +29,10 @@ export function useUtilization() {
   })
 
   const powerCapacity = computed(() => {
+    // Use resource providers if available, fallback to config
+    if (totalPowerCapacity.value > 0) {
+      return totalPowerCapacity.value
+    }
     return config.value.settings.totalPowerCapacity || 0
   })
 
@@ -42,6 +48,10 @@ export function useUtilization() {
   })
 
   const hvacCapacity = computed(() => {
+    // Use resource providers if available, fallback to config
+    if (totalCoolingCapacity.value > 0) {
+      return totalCoolingCapacity.value
+    }
     return config.value.settings.hvacCapacity || 0
   })
 
@@ -76,6 +86,10 @@ export function useUtilization() {
     return powerPercentage.value > 100 || hvacPercentage.value > 100
   })
 
+  const usingResourceProviders = computed(() => {
+    return totalPowerCapacity.value > 0 || totalCoolingCapacity.value > 0
+  })
+
   return {
     powerUsed,
     powerCapacity,
@@ -86,6 +100,7 @@ export function useUtilization() {
     ruUsed,
     ruCapacity,
     ruPercentage,
-    isOverCapacity
+    isOverCapacity,
+    usingResourceProviders
   }
 }
