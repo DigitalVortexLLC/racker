@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide helps you set up a development environment and contribute to RackSum.
+This guide helps you set up a development environment and contribute to Racker.
 
 ## Development Setup
 
@@ -99,7 +99,7 @@ racksum/
 
 ### Vue 3 Composition API
 
-RackSum uses Vue 3 with the Composition API.
+Racker uses Vue 3 with the Composition API.
 
 #### Example Component
 
@@ -199,7 +199,7 @@ Use Tailwind utility classes:
 
 ### PrimeVue Components
 
-RackSum uses PrimeVue for UI components:
+Racker uses PrimeVue for UI components:
 
 ```vue
 <script setup>

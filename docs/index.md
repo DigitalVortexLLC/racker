@@ -1,10 +1,10 @@
-# RackSum
+# Racker
 
-Welcome to RackSum, a comprehensive web-based tool for planning and visualizing server rack layouts with real-time power and HVAC capacity tracking.
+Welcome to Racker, a comprehensive web-based tool for planning and visualizing server rack layouts with real-time power and HVAC capacity tracking.
 
 ## Overview
 
-RackSum simplifies datacenter planning by providing an intuitive drag-and-drop interface for designing rack configurations. It automatically calculates power consumption and heat load, helping you optimize your infrastructure before deployment.
+Racker simplifies datacenter planning by providing an intuitive drag-and-drop interface for designing rack configurations. It automatically calculates power consumption and heat load, helping you optimize your infrastructure before deployment.
 
 ## Key Features
 
@@ -69,9 +69,23 @@ Get started with RackSum in just a few steps:
 
    Navigate to [http://localhost:5173](http://localhost:5173)
 
+### Site Management & Sharing
+
+- **Named Sites**: Create and manage multiple rack configurations with descriptive names
+- **UUID-Based Sharing**: Share rack layouts with colleagues using unique shareable links
+- **Authentication Support**: Optional passkey authentication for secure deployments
+- **Database Persistence**: Save and load configurations from backend database (when authentication enabled)
+- **Browser Storage**: Local persistence for quick access and offline work
+
+### Documentation & API Access
+
+- **Interactive Swagger UI**: Comprehensive API documentation at `/api/docs/`
+- **MkDocs Documentation**: User guides and references at `/docs/`
+- **Quick Access Links**: Navigation buttons in the app header for easy doc access
+
 ## Use Cases
 
-RackSum is perfect for:
+Racker is perfect for:
 
 - **Datacenter Managers**: Planning new installations or expansions
 - **IT Infrastructure Teams**: Visualizing equipment placement
@@ -84,8 +98,9 @@ RackSum is perfect for:
 - Check the [Installation Guide](installation.md) for setup instructions
 - Read the [Usage Guide](usage.md) for detailed workflow information
 - Review the [API Documentation](api.md) for programmatic access
+- Explore the [API Workflow Guide](api-workflow.md) for complete API usage examples
 - Explore [Configuration Options](configuration.md) to customize your setup
 
 ## License
 
-RackSum is licensed under the ISC License.
+Racker is licensed under the ISC License.

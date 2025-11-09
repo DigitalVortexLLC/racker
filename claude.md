@@ -204,7 +204,7 @@ Bottom-right legend showing:
 
 ## File Structure
 ```
-racksum/
+racker/
 ├── server.js                 # Express server
 ├── package.json
 ├── vite.config.js           # Vite configuration

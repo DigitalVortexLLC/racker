@@ -1,12 +1,12 @@
 # Usage Guide
 
-This guide provides detailed instructions on how to use RackSum for rack planning and management.
+This guide provides detailed instructions on how to use Racker for rack planning and management.
 
 ## Getting Started
 
 ### First Launch
 
-When you first launch RackSum, you'll see:
+When you first launch Racker, you'll see:
 
 1. An empty rack visualization area in the center
 2. A device library panel on the left
@@ -262,9 +262,43 @@ When POSTing configurations, devices are handled three ways:
 
 This allows you to import device lists where positions haven't been determined yet.
 
+### Site Management and Sharing
+
+Racker supports multiple rack configurations called "sites":
+
+#### Creating a Site
+
+1. Click on the site name in the header (default: "Add site name...")
+2. Enter a descriptive name for your rack configuration
+3. Press Enter to save
+
+#### Sharing a Site
+
+1. Ensure your site has a name
+2. Click the **Share** button in the header
+3. A shareable link is copied to your clipboard
+4. Send the link to colleagues to view your exact rack configuration
+
+**Note**: Shared links contain a UUID that uniquely identifies your site. Anyone with the link can view the configuration.
+
+#### Saving and Loading (With Authentication)
+
+When authentication is enabled:
+
+1. Click **Save** to store your configuration to the database
+2. Click **Load** to retrieve previously saved configurations
+3. Configurations are associated with your user account
+
+### Accessing Documentation
+
+Quick access to documentation from the app:
+
+1. Click **Docs** in the header to view this user documentation
+2. Click **API** in the header to access interactive Swagger API documentation
+
 ### Saving to Browser Storage
 
-RackSum automatically saves your configuration to localStorage:
+Racker automatically saves your configuration to localStorage:
 
 - Saves occur on every change
 - Data persists across browser sessions
@@ -274,7 +308,7 @@ To manually clear:
 
 1. Open browser DevTools (F12)
 2. Go to Application > Local Storage
-3. Find and delete `racksum-config`
+3. Find and delete `racker-config`
 
 ### Dark Mode
 
@@ -316,9 +350,9 @@ Toggle dark mode for comfortable viewing:
 ### Scenario 4: API Integration
 
 1. Generate device inventory in external system
-2. Format as RackSum JSON
+2. Format as Racker JSON
 3. POST to `/api/load` endpoint
-4. Review in RackSum UI
+4. Review in Racker UI
 5. Assign positions via drag-and-drop
 6. Export finalized configuration
 

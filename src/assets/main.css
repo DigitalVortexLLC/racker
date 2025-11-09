@@ -1,4 +1,76 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "racker-light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f8fafc;
+  --color-base-300: #e2e8f0;
+  --color-base-content: #0f172a;
+  --color-primary: #84cc16;
+  --color-primary-content: #0c0c0d;
+  --color-secondary: #65a30d;
+  --color-secondary-content: #ffffff;
+  --color-accent: #a3e635;
+  --color-accent-content: #0c0c0d;
+  --color-neutral: #475569;
+  --color-neutral-content: #ffffff;
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-success: #22c55e;
+  --color-success-content: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-content: #ffffff;
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+@plugin "daisyui/theme" {
+  name: "racker-dark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #18181b;
+  --color-base-200: #27272a;
+  --color-base-300: #3f3f46;
+  --color-base-content: #ffffff;
+  --color-primary: #84cc16;
+  --color-primary-content: #0c0c0d;
+  --color-secondary: #a3e635;
+  --color-secondary-content: #0c0c0d;
+  --color-accent: #65a30d;
+  --color-accent-content: #ffffff;
+  --color-neutral: #a1a1aa;
+  --color-neutral-content: #ffffff;
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-success: #22c55e;
+  --color-success-content: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-content: #ffffff;
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
 
 /* Color Palette Variables - Light Mode */
 :root {
@@ -45,73 +117,6 @@ body {
   width: 100%;
   height: 100vh;
   overflow: hidden;
-}
-
-/* PrimeVue Toast Styling */
-.p-toast {
-  opacity: 1;
-  z-index: 9999;
-}
-
-.p-toast-message {
-  margin: 0 0 1rem 0;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  padding: 1rem 1.5rem;
-  display: flex;
-  align-items: start;
-  gap: 0.75rem;
-}
-
-.p-toast-message-success {
-  background-color: var(--color-primary);
-  color: white;
-}
-
-.p-toast-message-error {
-  background-color: #ef4444;
-  color: white;
-}
-
-.p-toast-message-info {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary-dark);
-}
-
-.p-toast-message-warn {
-  background-color: var(--color-accent);
-  color: white;
-}
-
-.p-toast-message-content {
-  flex: 1;
-}
-
-.p-toast-summary {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.p-toast-detail {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.p-toast-icon-close {
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.p-toast-icon-close:hover {
-  opacity: 1;
 }
 
 /* Drag and Drop Animations */

@@ -12,8 +12,8 @@
     <!-- Position number (only shown on first RU of device or empty slot) -->
     <div
       v-if="showPositionNumber"
-      class="flex-shrink-0 w-8 text-xs text-gray-400 font-mono pl-1"
-      :class="{ 'text-white': device }"
+      class="flex-shrink-0 w-8 text-xs font-mono pl-1"
+      :class="device ? 'text-white' : 'text-base-content/40'"
     >
       {{ position }}
     </div>
@@ -28,7 +28,7 @@
       </span>
       <button
         @click="removeDevice"
-        class="text-white hover:text-red-200 ml-2 flex-shrink-0"
+        class="btn btn-ghost btn-xs btn-square text-white hover:text-error-content hover:bg-error/20 ml-2"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -85,9 +85,9 @@ const slotClasses = computed(() => {
     }
   } else {
     // Empty slot
-    classes.push('h-6 border-dashed')
+    classes.push('h-6 border-dashed bg-base-200 border-base-300')
     if (isDragOver.value) {
-      classes.push('drag-over')
+      classes.push('bg-primary/20 border-primary')
     }
   }
 
@@ -101,11 +101,8 @@ const slotStyle = computed(() => {
       borderColor: props.device.color
     }
   }
-  // Empty slot styling
-  return {
-    backgroundColor: 'var(--bg-secondary)',
-    borderColor: 'var(--border-color)'
-  }
+  // Empty slot uses daisyUI theme colors
+  return {}
 })
 
 const handleDragStart = (event) => {

@@ -1,8 +1,9 @@
-/* Custom styles for RackSum documentation */
+/* Custom styles for Racker documentation */
 
 :root {
-  --md-primary-fg-color: #3498DB;
-  --md-accent-fg-color: #8E44AD;
+  --md-primary-fg-color: #84cc16;
+  --md-primary-fg-color-dark: #65a30d;
+  --md-accent-fg-color: #a3e635;
 }
 
 /* Custom code block styling */
@@ -19,7 +20,7 @@ table {
 
 table th {
   background-color: var(--md-primary-fg-color);
-  color: white;
+  color: #0c0c0d;
   font-weight: 600;
   padding: 0.75rem;
   text-align: left;
@@ -52,13 +53,17 @@ table td {
 
 /* Footer styling */
 .md-footer {
-  background-color: #2c3e50;
+  background-color: #475569;
+}
+
+[data-md-color-scheme="slate"] .md-footer {
+  background-color: #27272a;
 }
 
 /* Custom container for notes */
 .custom-note {
-  background-color: #e3f2fd;
-  border-left: 4px solid #2196f3;
+  background-color: #f7fee7;
+  border-left: 4px solid var(--md-primary-fg-color);
   padding: 1rem;
   margin: 1rem 0;
   border-radius: 0.25rem;
@@ -77,8 +82,8 @@ table td {
 }
 
 [data-md-color-scheme="slate"] .custom-note {
-  background-color: rgba(33, 150, 243, 0.1);
-  border-left-color: #2196f3;
+  background-color: rgba(132, 204, 22, 0.1);
+  border-left-color: var(--md-primary-fg-color);
 }
 
 [data-md-color-scheme="slate"] .md-typeset code {

@@ -22,14 +22,34 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+import os
+
+def serve_mkdocs(request, path=''):
+    """Serve MkDocs documentation with proper handling of paths"""
+    docs_root = settings.BASE_DIR.parent / 'site'
+
+    # If path is empty or ends with /, serve index.html
+    if not path or path.endswith('/'):
+        path = (path or '') + 'index.html'
+
+    # Check if file exists, otherwise serve index.html (for SPA routing)
+    full_path = os.path.join(docs_root, path)
+    if not os.path.exists(full_path):
+        path = 'index.html'
+
+    return serve(request, path, document_root=docs_root)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include('api.urls')),
-    # OpenAPI/Swagger documentation endpoints
+    # MkDocs documentation (must come early to avoid Vue catch-all)
+    re_path(r'^docs/(?P<path>.*)$', serve_mkdocs, name='mkdocs-path'),
+    path('docs/', serve_mkdocs, name='mkdocs'),
+    # OpenAPI/Swagger documentation endpoints (must come before api/ include)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # API routes
+    path("api/", include('api.urls')),
 ]
 
 # Serve static files in development

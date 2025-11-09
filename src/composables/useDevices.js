@@ -27,7 +27,7 @@ export function useDevices() {
       const defaultCategories = devicesData.categories || []
       
       // Load custom device groups from localStorage
-      const savedGroups = localStorage.getItem('racksum-device-groups')
+      const savedGroups = localStorage.getItem('racker-device-groups')
       let customGroups = []
       if (savedGroups) {
         try {
@@ -38,7 +38,7 @@ export function useDevices() {
       }
 
       // Load custom devices from localStorage
-      const savedDevices = localStorage.getItem('racksum-custom-devices')
+      const savedDevices = localStorage.getItem('racker-custom-devices')
       let customDevices = []
       if (savedDevices) {
         try {

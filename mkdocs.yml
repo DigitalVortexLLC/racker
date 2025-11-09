@@ -1,10 +1,10 @@
-site_name: RackSum Documentation
-site_description: Comprehensive documentation for RackSum - Rack Diagram Planning Tool
-site_author: RackSum Team
-site_url: https://racksum.example.com
+site_name: Racker Documentation
+site_description: Comprehensive documentation for Racker - Rack Diagram Planning Tool
+site_author: Racker Team
+site_url: https://racker.example.com
 
-repo_name: DigitalVortexLLC/racksum
-repo_url: https://github.com/DigitalVortexLLC/racksum
+repo_name: DigitalVortexLLC/racker
+repo_url: https://github.com/DigitalVortexLLC/racker
 edit_uri: edit/main/docs/
 
 theme:
@@ -12,15 +12,15 @@ theme:
   palette:
     # Light mode
     - scheme: default
-      primary: blue
-      accent: indigo
+      primary: lime
+      accent: light green
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Dark mode
     - scheme: slate
-      primary: blue
-      accent: indigo
+      primary: lime
+      accent: light green
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -76,7 +76,7 @@ markdown_extensions:
   - pymdownx.magiclink:
       repo_url_shorthand: true
       user: DigitalVortexLLC
-      repo: racksum
+      repo: racker
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences:
@@ -95,8 +95,8 @@ extra:
     provider: mike
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/DigitalVortexLLC/racksum
-      name: RackSum on GitHub
+      link: https://github.com/DigitalVortexLLC/racker
+      name: Racker on GitHub
   analytics:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_ID
@@ -117,7 +117,10 @@ nav:
       - Deployment: deployment.md
       - Development: development.md
       - MCP Server Integration: mcp-server.md
+  - API:
+      - API Overview: api.md
+      - API Workflow Guide: api-workflow.md
   - Reference:
-      - API Documentation: api.md
+      - Swagger API Docs: SWAGGER_API_DOCS.md
 
-copyright: Copyright &copy; 2024 RackSum Team
+copyright: Copyright &copy; 2024 Racker Team

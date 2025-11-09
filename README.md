@@ -1,4 +1,4 @@
-# RackSum - Rack Diagram Planning Tool
+# Racker - Rack Diagram Planning Tool
 
 A web-based tool for planning and visualizing server rack layouts with real-time power and HVAC capacity tracking.
 
@@ -37,7 +37,7 @@ A web-based tool for planning and visualizing server rack layouts with real-time
 
 1. Clone or navigate to the project directory:
 ```bash
-cd racksum
+cd racker
 ```
 
 2. Install Node.js dependencies:
@@ -286,7 +286,7 @@ chmod +x start_server.sh
 ## Project Structure
 
 ```
-racksum/
+racker/
 ├── backend/             # Django backend
 │   ├── manage.py       # Django management script
 │   ├── backend/        # Django project settings
@@ -329,7 +329,7 @@ racksum/
 ### Database connection issues
 - Verify MySQL server is running
 - Check database credentials in `.env` file
-- Ensure database exists: `mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS racksum;"`
+- Ensure database exists: `mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS racker;"`
 - Run migrations: `npm run db:init`
 
 ## License

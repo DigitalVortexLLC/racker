@@ -11,7 +11,7 @@ const resourceProviders = ref([])
 
 export function useResourceProviders() {
   const loadProviders = () => {
-    const saved = localStorage.getItem('racksum-resource-providers')
+    const saved = localStorage.getItem('racker-resource-providers')
     if (saved) {
       try {
         resourceProviders.value = JSON.parse(saved)
@@ -23,7 +23,7 @@ export function useResourceProviders() {
   }
 
   const saveProviders = () => {
-    localStorage.setItem('racksum-resource-providers', JSON.stringify(resourceProviders.value))
+    localStorage.setItem('racker-resource-providers', JSON.stringify(resourceProviders.value))
   }
 
   const handleProvidersUpdated = () => {

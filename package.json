@@ -1,5 +1,5 @@
 {
-  "name": "racksum",
+  "name": "racker",
   "version": "1.0.0",
   "description": "Rack diagram planning tool with power and HVAC capacity tracking",
   "type": "module",
@@ -12,7 +12,14 @@
     "db:init": "cd backend && python manage.py migrate",
     "docs:serve": "mkdocs serve",
     "docs:build": "mkdocs build",
-    "docs:deploy": "mkdocs gh-deploy"
+    "docs:deploy": "mkdocs gh-deploy",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "lint:check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "rack",
@@ -33,5 +40,15 @@
     "tailwindcss": "^4.1.17",
     "vite": "^7.2.2",
     "vue": "^3.5.24"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^2.1.0",
+    "@vue/test-utils": "^2.4.6",
+    "daisyui": "^5.4.7",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.28.0",
+    "jsdom": "^25.0.0",
+    "prettier": "^3.3.0",
+    "vitest": "^2.1.0"
   }
 }

@@ -1,6 +1,6 @@
-# RackSum Documentation
+# Racker Documentation
 
-This directory contains the MkDocs documentation for RackSum.
+This directory contains the MkDocs documentation for Racker.
 
 ## Building the Documentation
 

@@ -23,10 +23,13 @@ export function useDarkMode() {
   })
 
   const updateTheme = () => {
+    const html = document.documentElement
     if (isDark.value) {
-      document.documentElement.classList.add('dark')
+      html.classList.add('dark')
+      html.setAttribute('data-theme', 'racker-dark')
     } else {
-      document.documentElement.classList.remove('dark')
+      html.classList.remove('dark')
+      html.setAttribute('data-theme', 'racker-light')
     }
   }
 

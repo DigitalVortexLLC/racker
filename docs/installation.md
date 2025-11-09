@@ -1,10 +1,10 @@
 # Installation Guide
 
-This guide will walk you through installing and setting up RackSum on your system.
+This guide will walk you through installing and setting up Racker on your system.
 
 ## Prerequisites
 
-Before installing RackSum, ensure you have the following software installed:
+Before installing Racker, ensure you have the following software installed:
 
 ### Required Software
 
@@ -36,16 +36,16 @@ Before installing RackSum, ensure you have the following software installed:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd racksum
+git clone https://github.com/DigitalVortexLLC/racker.git
+cd racker
 ```
 
 If you downloaded a ZIP file instead:
 
 ```bash
 # Extract and navigate to the directory
-unzip racksum.zip
-cd racksum
+unzip racker.zip
+cd racker
 ```
 
 ### 2. Install Node.js Dependencies
@@ -102,13 +102,16 @@ PORT=3000
 # Database Configuration (if using MySQL)
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=racksum
+DB_NAME=racker
 DB_USER=your_username
 DB_PASSWORD=your_password
 
 # Django Configuration
 SECRET_KEY=your-secret-key-here
 DEBUG=True
+
+# Authentication (optional - set to 1 to require authentication)
+REQUIRE_AUTH=0
 ```
 
 ### 5. Initialize Database (Optional)
@@ -144,13 +147,45 @@ pip list
 
 ### Development Mode
 
-For development with hot-reload:
+Racker uses a dual-server architecture for development:
+- **Vite dev server** (port 5173) - Frontend with hot-reload
+- **Django backend** (port 3000) - API and authentication
+
+#### Option 1: Use the startup script (Recommended)
+
+```bash
+./start_server.sh
+```
+
+This script:
+1. Checks for required dependencies
+2. Runs Django migrations
+3. Builds the Vue frontend
+4. Starts the Django server on port 3000
+
+Access the application at [http://localhost:3000](http://localhost:3000)
+
+#### Option 2: Run servers separately
+
+In one terminal, start the Vite dev server:
 
 ```bash
 npm run dev
 ```
 
-The application will be available at [http://localhost:5173](http://localhost:5173)
+In another terminal, start the Django backend:
+
+```bash
+cd backend
+python3 manage.py runserver 3000
+```
+
+- Frontend (Vite): [http://localhost:5173](http://localhost:5173)
+- Backend (Django): [http://localhost:3000](http://localhost:3000)
+- API Documentation: [http://localhost:3000/api/docs/](http://localhost:3000/api/docs/)
+- User Docs: [http://localhost:3000/docs/](http://localhost:3000/docs/)
+
+**Note**: For the full application experience, use port 3000 which serves the built frontend and backend together.
 
 ### Production Mode
 
@@ -160,14 +195,9 @@ For production deployment:
 # Build the frontend
 npm run build
 
-# Start the backend server
-npm run server
-```
-
-Or use the combined command:
-
-```bash
-npm start
+# Start the Django server
+cd backend
+python3 manage.py runserver 3000
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000)
@@ -241,7 +271,7 @@ If you have MySQL connection problems:
 3. Ensure the database exists:
    ```bash
    mysql -u root -p
-   CREATE DATABASE racksum;
+   CREATE DATABASE racker;
    ```
 
 ### Build Errors
@@ -264,14 +294,14 @@ npm run build
 
 Once installation is complete:
 
-1. Read the [Usage Guide](usage.md) to learn how to use RackSum
+1. Read the [Usage Guide](usage.md) to learn how to use Racker
 2. Review [Configuration Options](configuration.md) to customize your setup
 3. Explore the [API Documentation](api.md) for programmatic access
 4. Check out the [Development Guide](development.md) if you want to contribute
 
 ## Uninstalling
 
-To remove RackSum from your system:
+To remove Racker from your system:
 
 ```bash
 # Remove node_modules
@@ -282,5 +312,72 @@ rm -rf venv
 
 # Remove the entire project directory
 cd ..
-rm -rf racksum
+rm -rf racker
+```
+
+## Database Setup (MySQL)
+
+If you want to use the database features for site persistence and authentication:
+
+### 1. Create MySQL Database
+
+```bash
+mysql -u root -p
+```
+
+In the MySQL prompt:
+
+```sql
+CREATE DATABASE racker CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'racker_user'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON racker.* TO 'racker_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+### 2. Configure Database in .env
+
+Update your `.env` file:
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=racker
+DB_USER=racker_user
+DB_PASSWORD=your_secure_password
+```
+
+### 3. Run Migrations
+
+```bash
+cd backend
+python3 manage.py migrate
+cd ..
+```
+
+This creates the necessary tables:
+- `api_site` - Site configurations
+- `api_rackconfiguration` - Saved rack layouts
+- `api_device` - Custom device definitions
+- `api_rack` - Individual racks
+- `api_rackdevice` - Devices placed in racks
+- `auth_user` - User accounts (if authentication enabled)
+- `webauthn_*` - Passkey authentication tables
+
+### 4. Create Admin User (Optional)
+
+If you enable authentication, create an admin user:
+
+```bash
+cd backend
+python3 manage.py createsuperuser
+cd ..
+```
+
+Follow the prompts to set username, email, and password.
+
+### 5. Access Admin Panel
+
+With authentication enabled, access the Django admin at:
+[http://localhost:3000/admin](http://localhost:3000/admin)
 ```

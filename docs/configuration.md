@@ -1,12 +1,12 @@
 # Configuration Guide
 
-This guide explains how to configure and customize RackSum for your specific needs.
+This guide explains how to configure and customize Racker for your specific needs.
 
 ## Environment Configuration
 
 ### Environment Variables
 
-RackSum uses environment variables for configuration. Create a `.env` file in the project root:
+Racker uses environment variables for configuration. Create a `.env` file in the project root:
 
 ```env
 # Server Configuration

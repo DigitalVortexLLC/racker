@@ -139,6 +139,34 @@ class SiteViewSet(viewsets.ModelViewSet):
             'message': 'Site deleted successfully'
         })
 
+    @extend_schema(
+        summary="Get site by UUID",
+        description="Retrieve a site by its UUID for shareable links",
+        tags=["Sites"],
+        parameters=[
+            OpenApiParameter(
+                name='uuid',
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                description='Site UUID'
+            )
+        ]
+    )
+    @action(detail=False, methods=['get'], url_path='by-uuid/(?P<site_uuid>[^/.]+)')
+    def by_uuid(self, request, site_uuid=None):
+        """
+        Get a site by UUID (for shareable links)
+        """
+        try:
+            site = Site.objects.get(uuid=site_uuid)
+            serializer = self.get_serializer(site)
+            return Response(serializer.data)
+        except Site.DoesNotExist:
+            return Response(
+                {'error': 'Site not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 @extend_schema(
     summary="List or create rack configurations",

@@ -1,6 +1,6 @@
 # MCP Server Integration
 
-RackSum includes an optional Model Context Protocol (MCP) server that allows AI assistants like Claude to access site statistics and resource information directly.
+Racker includes an optional Model Context Protocol (MCP) server that allows AI assistants like Claude to access site statistics and resource information directly.
 
 ## Overview
 

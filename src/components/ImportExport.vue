@@ -1,46 +1,32 @@
 <template>
-  <div
-    class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-200"
-    style="background-color: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px);"
-    @click.self="$emit('close')"
-  >
-    <div class="rounded-xl shadow-2xl w-full max-w-2xl transform transition-all duration-200" style="background-color: var(--bg-primary);">
-      <div class="flex items-center justify-between mb-6 p-6 rounded-t-xl" style="background-color: var(--color-primary);">
-        <h2 class="text-2xl font-bold" style="color: #0c0c0d;">Import / Export Configuration</h2>
-        <button
-          @click="$emit('close')"
-          class="transition-colors"
-          style="color: rgba(12, 12, 13, 0.7);"
-          @mouseover="$event.target.style.color = '#0c0c0d'"
-          @mouseout="$event.target.style.color = 'rgba(12, 12, 13, 0.7)'"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div class="modal modal-open" @click.self="$emit('close')">
+    <div class="modal-box w-full max-w-2xl">
+      <div class="flex items-center justify-between mb-6 p-6 -mt-6 -mx-6 rounded-t-xl bg-primary">
+        <h2 class="text-2xl font-bold text-primary-content">Import / Export Configuration</h2>
+        <button @click="$emit('close')" class="btn btn-ghost btn-sm btn-circle text-primary-content">
+          <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <div class="px-6">
+      <div>
 
       <!-- Tabs -->
-      <div class="flex mb-4" style="border-bottom: 1px solid var(--border-color);">
+      <div role="tablist" class="tabs tabs-border mb-4">
         <button
+          role="tab"
+          class="tab"
+          :class="{ 'tab-active': activeTab === 'export' }"
           @click="activeTab = 'export'"
-          class="px-4 py-2 border-b-2 border-transparent font-medium transition-colors"
-          :style="{
-            borderColor: activeTab === 'export' ? 'var(--color-primary)' : 'transparent',
-            color: activeTab === 'export' ? 'var(--color-primary)' : 'var(--text-primary)'
-          }"
         >
           Export
         </button>
         <button
+          role="tab"
+          class="tab"
+          :class="{ 'tab-active': activeTab === 'import' }"
           @click="activeTab = 'import'"
-          class="px-4 py-2 border-b-2 border-transparent font-medium transition-colors"
-          :style="{
-            borderColor: activeTab === 'import' ? 'var(--color-primary)' : 'transparent',
-            color: activeTab === 'import' ? 'var(--color-primary)' : 'var(--text-primary)'
-          }"
         >
           Import
         </button>
@@ -49,35 +35,20 @@
       <!-- Export Tab -->
       <div v-if="activeTab === 'export'" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
-            Configuration JSON
+          <label class="label">
+            <span class="label-text">Configuration JSON</span>
           </label>
           <textarea
             :value="exportJson"
             readonly
-            class="w-full h-64 px-3 py-2 rounded font-mono text-xs focus:outline-none transition-colors"
-            style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);"
-            @focus="$event.target.style.borderColor = 'var(--color-primary)'; $event.target.style.boxShadow = '0 0 0 2px rgba(132, 204, 22, 0.2)'"
-            @blur="$event.target.style.borderColor = 'var(--border-color)'; $event.target.style.boxShadow = 'none'"
+            class="textarea textarea-bordered w-full h-64 font-mono text-xs"
           ></textarea>
         </div>
         <div class="flex gap-2">
-          <button
-            @click="copyToClipboard"
-            class="px-4 py-2 text-white rounded transition-colors"
-            style="background-color: var(--color-primary);"
-            @mouseover="$event.target.style.backgroundColor = 'var(--color-primary-dark)'"
-            @mouseout="$event.target.style.backgroundColor = 'var(--color-primary)'"
-          >
+          <button @click="copyToClipboard" class="btn btn-primary">
             {{ copyButtonText }}
           </button>
-          <button
-            @click="downloadJson"
-            class="px-4 py-2 text-white rounded transition-colors"
-            style="background-color: var(--color-accent);"
-            @mouseover="$event.target.style.opacity = '0.9'"
-            @mouseout="$event.target.style.opacity = '1'"
-          >
+          <button @click="downloadJson" class="btn btn-accent">
             Download File
           </button>
         </div>
@@ -86,34 +57,20 @@
       <!-- Import Tab -->
       <div v-if="activeTab === 'import'" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
-            Paste Configuration JSON
+          <label class="label">
+            <span class="label-text">Paste Configuration JSON</span>
           </label>
           <textarea
             v-model="importJson"
             placeholder="Paste your configuration JSON here..."
-            class="w-full h-64 px-3 py-2 rounded font-mono text-xs focus:outline-none transition-colors"
-            style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);"
-            @focus="$event.target.style.borderColor = 'var(--color-primary)'; $event.target.style.boxShadow = '0 0 0 2px rgba(132, 204, 22, 0.2)'"
-            @blur="$event.target.style.borderColor = 'var(--border-color)'; $event.target.style.boxShadow = 'none'"
+            class="textarea textarea-bordered w-full h-64 font-mono text-xs"
           ></textarea>
         </div>
         <div class="flex gap-2">
-          <button
-            @click="loadFromJson"
-            class="px-4 py-2 text-white rounded transition-colors"
-            style="background-color: var(--color-primary);"
-            @mouseover="$event.target.style.backgroundColor = 'var(--color-primary-dark)'"
-            @mouseout="$event.target.style.backgroundColor = 'var(--color-primary)'"
-          >
+          <button @click="loadFromJson" class="btn btn-primary">
             Load Configuration
           </button>
-          <label
-            class="px-4 py-2 text-white rounded cursor-pointer transition-opacity"
-            style="background-color: var(--color-accent);"
-            @mouseover="$event.target.style.opacity = '0.9'"
-            @mouseout="$event.target.style.opacity = '1'"
-          >
+          <label class="btn btn-accent">
             Upload File
             <input
               type="file"
@@ -123,23 +80,17 @@
             />
           </label>
         </div>
-        <div v-if="importError" class="text-red-600 text-sm">
-          {{ importError }}
+        <div v-if="importError" class="alert alert-error">
+          <span>{{ importError }}</span>
         </div>
-        <div v-if="importSuccess" class="text-green-600 text-sm">
-          Configuration loaded successfully!
+        <div v-if="importSuccess" class="alert alert-success">
+          <span>Configuration loaded successfully!</span>
         </div>
       </div>
 
         <!-- Close Button -->
-        <div class="mt-6 flex justify-end pb-6">
-          <button
-            @click="$emit('close')"
-            class="px-4 py-2 rounded transition-opacity"
-            style="background-color: var(--color-primary-light); color: var(--color-primary-dark);"
-            @mouseover="$event.target.style.opacity = '0.8'"
-            @mouseout="$event.target.style.opacity = '1'"
-          >
+        <div class="mt-6 flex justify-end">
+          <button @click="$emit('close')" class="btn">
             Close
           </button>
         </div>
@@ -187,7 +138,7 @@ const downloadJson = () => {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `racksum-config-${Date.now()}.json`
+  a.download = `racker-config-${Date.now()}.json`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

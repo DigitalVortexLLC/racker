@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers deploying RackSum to production environments.
+This guide covers deploying Racker to production environments.
 
 ## Pre-Deployment Checklist
 

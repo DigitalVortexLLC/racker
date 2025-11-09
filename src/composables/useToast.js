@@ -1,42 +1,48 @@
-import { useToast as usePrimeToast } from 'primevue/usetoast'
+import { ref } from 'vue'
+
+const toasts = ref([])
+let nextId = 0
 
 export function useToast() {
-  const toast = usePrimeToast()
+  const addToast = (type, message, detail = '', duration = 3000) => {
+    const id = nextId++
+    const toast = {
+      id,
+      type,
+      message,
+      detail,
+      duration
+    }
+    
+    toasts.value.push(toast)
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      removeToast(id)
+    }, duration)
+  }
+
+  const removeToast = (id) => {
+    const index = toasts.value.findIndex(t => t.id === id)
+    if (index > -1) {
+      toasts.value.splice(index, 1)
+    }
+  }
 
   const showSuccess = (message, detail = '') => {
-    toast.add({
-      severity: 'success',
-      summary: message,
-      detail,
-      life: 3000
-    })
+    addToast('success', message, detail, 3000)
   }
 
   const showError = (message, detail = '') => {
-    toast.add({
-      severity: 'error',
-      summary: message,
-      detail,
-      life: 5000
-    })
+    addToast('error', message, detail, 5000)
   }
 
   const showInfo = (message, detail = '') => {
-    toast.add({
-      severity: 'info',
-      summary: message,
-      detail,
-      life: 3000
-    })
+    addToast('info', message, detail, 3000)
   }
 
   const showWarn = (message, detail = '') => {
-    toast.add({
-      severity: 'warn',
-      summary: message,
-      detail,
-      life: 4000
-    })
+    addToast('warning', message, detail, 4000)
   }
 
   // Generic showToast function that maps severity to specific functions
@@ -54,10 +60,12 @@ export function useToast() {
   }
 
   return {
+    toasts,
     showSuccess,
     showError,
     showInfo,
     showWarn,
-    showToast
+    showToast,
+    removeToast
   }
 }

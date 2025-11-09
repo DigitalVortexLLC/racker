@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue'
 import { useDatabase } from './useDatabase'
 
-const STORAGE_KEY = 'racksum-config'
+const STORAGE_KEY = 'racker-config'
 
 // Debounce timer for auto-save
 let autoSaveTimer = null
@@ -105,6 +105,7 @@ export function useRackConfig() {
         config.value.racks.push({
           id: `rack-${i + 1}`,
           name: `Rack ${i + 1}`,
+          ruSize: config.value.settings.ruPerRack, // Use global default
           devices: []
         })
       }
@@ -153,7 +154,8 @@ export function useRackConfig() {
     const rack = config.value.racks.find(r => r.id === rackId)
     if (!rack) return false
 
-    const maxRU = config.value.settings.ruPerRack
+    // Use rack-specific RU size if available, otherwise fall back to global setting
+    const maxRU = rack.ruSize || config.value.settings.ruPerRack
 
     // Check if device would exceed rack height
     if (position + ruSize - 1 > maxRU) {
@@ -232,8 +234,15 @@ export function useRackConfig() {
       })
     }
 
+    // Ensure all racks have ruSize property (for backward compatibility)
+    const racksWithRuSize = newConfig.racks.map(rack => ({
+      ...rack,
+      ruSize: rack.ruSize || newConfig.settings.ruPerRack || 42
+    }))
+
     config.value = {
       ...newConfig,
+      racks: racksWithRuSize,
       unrackedDevices: newConfig.unrackedDevices || unracked,
       metadata: {
         ...newConfig.metadata,
@@ -251,6 +260,7 @@ export function useRackConfig() {
     const newRack = {
       id: `rack-${Date.now()}`,
       name: `Rack ${rackCount + 1}`,
+      ruSize: config.value.settings.ruPerRack, // Use global default
       devices: []
     }
     config.value.racks.push(newRack)
@@ -279,6 +289,17 @@ export function useRackConfig() {
     return true
   }
 
+  const reorderRacks = (fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return
+    if (fromIndex < 0 || fromIndex >= config.value.racks.length) return
+    if (toIndex < 0 || toIndex >= config.value.racks.length) return
+
+    const newRacks = [...config.value.racks]
+    const [movedRack] = newRacks.splice(fromIndex, 1)
+    newRacks.splice(toIndex, 0, movedRack)
+    config.value.racks = newRacks
+  }
+
   return {
     config,
     racks,
@@ -294,6 +315,7 @@ export function useRackConfig() {
     loadConfiguration,
     resetConfiguration,
     addRack,
-    deleteRack
+    deleteRack,
+    reorderRacks
   }
 }

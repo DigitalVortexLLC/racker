@@ -1,6 +1,6 @@
 # API Reference
 
-RackSum provides a REST API for programmatic access to configuration management. This allows integration with external tools, automation workflows, and custom applications.
+Racker provides a comprehensive REST API for programmatic access to configuration management, site management, device libraries, and rack operations. This allows integration with external tools, automation workflows, and custom applications.
 
 ## Base URL
 
@@ -12,18 +12,37 @@ For production deployments, replace `localhost:3000` with your server's address.
 
 ## Authentication
 
-Currently, the API does not require authentication. For production deployments, consider implementing:
+**No API key or authentication is required when authentication is disabled.** All API endpoints use `AllowAny` permissions, making the API freely accessible for:
 
-- API keys
-- OAuth 2.0
-- JWT tokens
-- Basic authentication
+- Development and testing
+- Internal network deployments
+- Quick prototyping and experimentation
+
+For production deployments, you can enable authentication features including:
+
+- **Passkey/WebAuthn authentication**: Modern passwordless authentication
+- **Session-based authentication**: Traditional cookie-based sessions
+- **Per-user data isolation**: Sites and configurations are user-specific when auth is enabled
+
+### Checking Authentication Status
+
+```bash
+curl http://localhost:3000/api/auth/config
+```
+
+Response:
+```json
+{
+  "require_auth": false,
+  "passkey_supported": true
+}
+```
 
 ## Endpoints
 
 ### Load Configuration
 
-Load a rack configuration into RackSum.
+Load a rack configuration into Racker.
 
 **Endpoint:** `POST /api/load`
 
@@ -397,12 +416,12 @@ curl http://localhost:3000/api/devices | jq '.'
 ### Automated Deployment Planning
 
 ```python
-# Example: Generate RackSum config from infrastructure-as-code
+# Example: Generate Racker config from infrastructure-as-code
 
 import json
 
 def generate_racksum_config(servers, switches, power_capacity):
-    """Generate RackSum configuration from server inventory"""
+    """Generate Racker configuration from server inventory"""
 
     config = {
         "settings": {

@@ -1,72 +1,71 @@
 <template>
   <aside
-    class="shadow-lg transition-all duration-300 flex flex-col fixed right-0 top-0 h-screen z-10"
-    :class="[isExpanded ? 'w-80' : 'w-16', { 'drop-zone-active': isDragOver }]"
-    :style="{ backgroundColor: 'var(--bg-primary)', borderLeft: '1px solid var(--border-color)' }"
+    class="shadow-lg transition-all duration-300 flex flex-col bg-base-100 border-t border-base-300"
+    :class="[isExpanded ? 'h-64' : 'h-16', { 'drop-zone-active': isDragOver }]"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
   >
     <!-- Header with Toggle -->
     <div
-      class="px-6 border-b transition-colors relative flex items-center"
-      :class="{ 'cursor-pointer': isExpanded }"
-      style="background-color: var(--color-primary); min-height: 68px;"
+      class="px-6 border-b border-base-300 transition-colors relative flex items-center bg-primary h-16"
+      :class="{ 'cursor-pointer hover:opacity-90': isExpanded }"
       @click="isExpanded ? isExpanded = false : null"
-      @mouseover="isExpanded ? $event.target.style.opacity = '0.9' : null"
-      @mouseout="isExpanded ? $event.target.style.opacity = '1' : null"
     >
-      <div v-if="isExpanded" class="flex items-center justify-between w-full py-4">
-        <div>
-          <h2 class="text-2xl font-bold leading-none" style="color: #0c0c0d;">Unracked Devices</h2>
-          <p class="text-xs mt-1" style="color: rgba(12, 12, 13, 0.7);">
+      <div v-if="isExpanded" class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-4">
+          <h2 class="text-xl font-bold text-primary-content">Unracked Devices</h2>
+          <p class="text-sm text-primary-content/70">
             {{ unrackedDevices.length }} device{{ unrackedDevices.length !== 1 ? 's' : '' }}
           </p>
         </div>
-        <button style="color: rgba(12, 12, 13, 0.7);" @mouseover="$event.target.style.color = '#0c0c0d'" @mouseout="$event.target.style.color = 'rgba(12, 12, 13, 0.7)'">
+        <button class="btn btn-ghost btn-sm btn-square text-primary-content/70 hover:text-primary-content">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
       </div>
 
-      <!-- Collapsed View - Just Icon -->
-      <div v-else class="flex items-center justify-center w-full">
-        <!-- Icon with Badge -->
-        <div class="relative">
-          <svg class="w-6 h-6" style="color: #0c0c0d;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Collapsed View - Just Icon and Count -->
+      <div v-else class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-primary-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
-          <!-- Notification Badge -->
+          <span class="text-primary-content font-semibold">Unracked Devices</span>
           <span
             v-if="unrackedDevices.length > 0"
-            class="absolute -top-2 -right-2 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
-            style="background-color: #ef4444;"
+            class="badge badge-error text-xs font-bold"
           >
-            {{ unrackedDevices.length > 9 ? '9+' : unrackedDevices.length }}
+            {{ unrackedDevices.length }}
           </span>
         </div>
+        <button 
+          @click.stop="isExpanded = true"
+          class="btn btn-ghost btn-sm btn-square text-primary-content/70 hover:text-primary-content"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
       </div>
     </div>
 
-    <div v-show="isExpanded" class="p-4 flex-1 overflow-y-auto">
-      <div v-if="unrackedDevices.length === 0" class="text-center py-8" style="color: var(--text-secondary);">
-        <svg class="w-12 h-12 mx-auto mb-2" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div v-show="isExpanded" class="p-4 flex-1 overflow-y-auto overflow-x-auto">
+      <div v-if="unrackedDevices.length === 0" class="text-center py-8 text-base-content/60">
+        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
         <p class="text-sm">All devices racked</p>
       </div>
 
-      <div v-else class="space-y-2">
+      <div v-else class="flex gap-2 flex-wrap">
         <div
           v-for="device in unrackedDevices"
           :key="device.instanceId"
           :draggable="true"
           @dragstart="handleDragStart($event, device)"
-          class="p-3 rounded cursor-move transition-colors border"
-          style="background-color: rgba(132, 204, 22, 0.08); border-color: var(--border-color);"
-          @mouseover="$event.target.style.backgroundColor = 'rgba(132, 204, 22, 0.12)'"
-          @mouseout="$event.target.style.backgroundColor = 'rgba(132, 204, 22, 0.08)'"
+          class="p-3 rounded cursor-move transition-colors border border-base-300 bg-primary/10 hover:bg-primary/20 flex items-center gap-3 min-w-[200px]"
         >
           <div class="flex items-center gap-3">
             <!-- Color indicator -->
@@ -77,10 +76,10 @@
 
             <!-- Device info -->
             <div class="flex-1 min-w-0">
-              <div class="font-medium text-sm truncate" style="color: var(--text-primary);">
+              <div class="font-medium text-sm truncate">
                 {{ device.customName || device.name }}
               </div>
-              <div class="text-xs" style="color: var(--text-secondary);">
+              <div class="text-xs text-base-content/60">
                 {{ device.ruSize }}U • {{ device.powerDraw }}W
               </div>
             </div>
@@ -88,10 +87,7 @@
             <!-- Remove button -->
             <button
               @click="removeDevice(device.instanceId)"
-              class="flex-shrink-0 transition-colors"
-              style="color: #ef4444;"
-              @mouseover="$event.target.style.color = '#dc2626'"
-              @mouseout="$event.target.style.color = '#ef4444'"
+              class="btn btn-ghost btn-xs btn-square text-error hover:text-error flex-shrink-0"
               title="Remove device"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,37 +95,19 @@
               </svg>
             </button>
           </div>
-
-          <div v-if="device.description" class="text-xs mt-2" style="color: var(--text-secondary);">
-            {{ device.description }}
-          </div>
         </div>
       </div>
 
       <!-- Helper text -->
       <div
         v-if="unrackedDevices.length > 0"
-        class="mt-4 p-3 rounded border"
-        style="background-color: rgba(132, 204, 22, 0.1); border-color: var(--border-color);"
+        class="alert alert-info mt-4"
       >
-        <p class="text-xs" style="color: var(--color-primary-dark);">
-          💡 Drag devices from here into racks to assign them positions.
-        </p>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-xs">Drag devices from here into racks to assign them positions.</span>
       </div>
-    </div>
-
-    <!-- Expand Arrow Button (bottom of panel when collapsed) -->
-    <div
-      v-if="!isExpanded"
-      class="mt-auto p-4 cursor-pointer transition-colors flex items-center justify-center"
-      style="background-color: var(--color-primary);"
-      @click="isExpanded = true"
-      @mouseover="$event.target.style.opacity = '0.9'"
-      @mouseout="$event.target.style.opacity = '1'"
-    >
-      <svg class="w-5 h-5" style="color: #0c0c0d;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
     </div>
   </aside>
 </template>
@@ -184,7 +162,7 @@ const removeDevice = (instanceId) => {
 
 <style scoped>
 .drop-zone-active {
-  box-shadow: inset 0 0 0 3px var(--color-primary);
+  box-shadow: inset 0 0 0 3px oklch(var(--p));
   transition: box-shadow 0.2s ease;
 }
 </style>

@@ -193,11 +193,11 @@ export function useDatabase() {
   function setCurrentSite(site) {
     currentSite.value = site;
     if (site) {
-      localStorage.setItem('racksum-current-site', JSON.stringify(site));
+      localStorage.setItem('racker-current-site', JSON.stringify(site));
     } else {
-      localStorage.removeItem('racksum-current-site');
+      localStorage.removeItem('racker-current-site');
       currentRackName.value = null;
-      localStorage.removeItem('racksum-current-rack-name');
+      localStorage.removeItem('racker-current-rack-name');
     }
   }
 
@@ -207,9 +207,9 @@ export function useDatabase() {
   function setCurrentRackName(rackName) {
     currentRackName.value = rackName;
     if (rackName) {
-      localStorage.setItem('racksum-current-rack-name', rackName);
+      localStorage.setItem('racker-current-rack-name', rackName);
     } else {
-      localStorage.removeItem('racksum-current-rack-name');
+      localStorage.removeItem('racker-current-rack-name');
     }
   }
 
@@ -218,16 +218,44 @@ export function useDatabase() {
    */
   function loadCurrentSite() {
     try {
-      const saved = localStorage.getItem('racksum-current-site');
+      const saved = localStorage.getItem('racker-current-site');
       if (saved) {
         currentSite.value = JSON.parse(saved);
       }
-      const savedRackName = localStorage.getItem('racksum-current-rack-name');
+      const savedRackName = localStorage.getItem('racker-current-rack-name');
       if (savedRackName) {
         currentRackName.value = savedRackName;
       }
     } catch (err) {
       console.error('Error loading current site:', err);
+    }
+  }
+
+  /**
+   * Fetch a site by UUID (for shareable links)
+   */
+  async function fetchSiteByUuid(uuid) {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sites/by-uuid/${uuid}`, {
+        credentials: 'same-origin',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch site: ${response.statusText}`);
+      }
+
+      const site = await response.json();
+      setCurrentSite(site);
+      return site;
+    } catch (err) {
+      error.value = err.message;
+      console.error('Error fetching site by UUID:', err);
+      throw err;
+    } finally {
+      loading.value = false;
     }
   }
 
@@ -415,6 +443,7 @@ export function useDatabase() {
     setCurrentSite,
     loadCurrentSite,
     setCurrentRackName,
+    fetchSiteByUuid,
 
     // Rack operations
     saveRackConfiguration,
