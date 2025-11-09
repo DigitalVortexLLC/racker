@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # Third-party apps
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
     # Local apps
     "api",
 ]
@@ -174,6 +175,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Allow URLs without trailing slashes
@@ -192,3 +194,22 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
 CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+# drf-spectacular settings for OpenAPI/Swagger documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'RackSum API',
+    'DESCRIPTION': 'Datacenter Rack Management API - Manage sites, racks, devices, and resource utilization with WebAuthn/Passkey authentication',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'TAGS': [
+        {'name': 'Sites', 'description': 'Physical datacenter site management'},
+        {'name': 'Devices', 'description': 'Device template and type management'},
+        {'name': 'Racks', 'description': 'Rack configuration and management'},
+        {'name': 'Rack Devices', 'description': 'Device placement within racks'},
+        {'name': 'Resource Usage', 'description': 'Power and HVAC resource calculations'},
+        {'name': 'Authentication', 'description': 'WebAuthn/Passkey authentication endpoints'},
+        {'name': 'Legacy', 'description': 'Legacy compatibility endpoints'},
+    ],
+}
