@@ -86,6 +86,19 @@
         </div>
         <div class="text-xs mt-1" style="color: var(--text-secondary);">{{ ruPercentage }}%</div>
       </div>
+
+      <!-- Details Button -->
+      <div class="mt-4">
+        <button
+          @click.stop="showDetailModal = true"
+          class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+          style="background-color: var(--bg-secondary); color: var(--text-primary);"
+          @mouseover="$event.target.style.backgroundColor = 'var(--border-color)'"
+          @mouseout="$event.target.style.backgroundColor = 'var(--bg-secondary)'"
+        >
+          View Details
+        </button>
+      </div>
     </div>
 
     <!-- Compact View (when collapsed) -->
@@ -144,6 +157,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Resource Detail Modal -->
+    <ResourceDetailModal v-model="showDetailModal" />
   </div>
 </template>
 
@@ -151,8 +167,10 @@
 import { ref, computed, inject } from 'vue'
 import { useUtilization } from '../composables/useUtilization'
 import { btuToTons } from '../utils/calculations'
+import ResourceDetailModal from './ResourceDetailModal.vue'
 
 const isExpanded = ref(false)
+const showDetailModal = ref(false)
 const unrackedPanelExpanded = inject('unrackedPanelExpanded', ref(true))
 
 const unrackedPanelOffset = computed(() => {
