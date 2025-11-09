@@ -78,7 +78,7 @@
             Manage Devices
           </button>
           <button
-            v-if="authConfig.passkey_supported"
+            v-if="authConfig.require_auth && authConfig.passkey_supported"
             @click="showPasskeyAuth = true"
             class="px-4 py-2 rounded transition-colors font-medium"
             style="background-color: rgba(0, 0, 0, 0.1); color: #0c0c0d;"
