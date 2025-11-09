@@ -63,6 +63,7 @@ docs/
 ├── deployment.md        # Deployment guide
 ├── development.md       # Development guide
 ├── api.md               # API reference
+├── mcp-server.md        # MCP Server integration guide
 ├── stylesheets/         # Custom CSS
 │   └── extra.css
 └── javascripts/         # Custom JavaScript

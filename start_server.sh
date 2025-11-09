@@ -64,7 +64,18 @@ else:
     print('✓ Admin user already exists')
 " 2>/dev/null || echo "  (Skipping superuser check)"
 
-# Step 8: Start Django server
+# Step 8: Check MCP server configuration
+echo ""
+if [ -f "../.env" ] && grep -q "MCP_ENABLED=true" ../.env; then
+    echo "🤖 MCP Server: ENABLED"
+    echo "   The MCP server will start automatically with Django"
+    echo "   Available tools: site stats, resource usage, device info"
+else
+    echo "ℹ️  MCP Server: DISABLED"
+    echo "   To enable: Set MCP_ENABLED=true in .env file"
+fi
+
+# Step 9: Start Django server
 echo ""
 echo "🚀 Starting Django server on port 3000..."
 echo "========================================================"

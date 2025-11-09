@@ -192,3 +192,7 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
 CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+# MCP Server Configuration
+MCP_ENABLED = os.getenv("MCP_ENABLED", "false").lower() == "true"
+MCP_PORT = int(os.getenv("MCP_PORT", "3001"))
