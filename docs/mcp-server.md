@@ -1,0 +1,295 @@
+# MCP Server Integration
+
+RackSum includes an optional Model Context Protocol (MCP) server that allows AI assistants like Claude to access site statistics and resource information directly.
+
+## Overview
+
+The MCP server provides a programmatic interface for AI assistants to:
+- Query site statistics and rack configurations
+- Get real-time resource utilization data (power, HVAC)
+- List available device types and specifications
+- Generate resource summaries across all sites
+
+## Configuration
+
+### Enabling the MCP Server
+
+1. Create a `.env` file in the project root (or copy from `.env.example`)
+2. Add the following configuration:
+
+```bash
+# MCP Server Configuration
+MCP_ENABLED=true
+MCP_PORT=3001
+```
+
+### Configuration Options
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MCP_ENABLED` | Enable/disable the MCP server | `false` |
+| `MCP_PORT` | Port for the MCP server (not used in stdio mode) | `3001` |
+
+## Starting the MCP Server
+
+### Automatic Startup (Recommended)
+
+When `MCP_ENABLED=true`, the MCP server starts automatically when you run:
+
+```bash
+./start_server.sh
+```
+
+The server runs in a background thread alongside Django, using stdio for communication.
+
+### Manual Startup
+
+You can also start the MCP server manually using Django's management command:
+
+```bash
+cd backend
+source ../venv/bin/activate
+python manage.py start_mcp_server
+```
+
+## Available Tools
+
+The MCP server provides the following tools:
+
+### 1. get_site_stats
+
+Get statistics for all sites in the system.
+
+**Parameters:** None
+
+**Returns:** List of all sites with:
+- Number of racks
+- Total devices
+- Power consumption (W/kW)
+- HVAC load (BTU/hr, tons)
+
+**Example Output:**
+```
+=== SITE STATISTICS ===
+
+📍 Site: Main Datacenter
+   Racks: 5
+   Devices: 47
+   Total Power: 12,450 W (12.45 kW)
+   Total HVAC Load: 42,454 BTU/hr (3.54 tons)
+   Created: 2025-01-15 10:30
+```
+
+### 2. get_site_details
+
+Get detailed information about a specific site.
+
+**Parameters:**
+- `site_name` (string, required): Name of the site
+
+**Returns:** Detailed site information including:
+- Site description and metadata
+- List of all racks with usage statistics
+- Space utilization per rack
+- Power and HVAC loads per rack
+
+**Example:**
+```json
+{
+  "site_name": "Main Datacenter"
+}
+```
+
+### 3. get_rack_details
+
+Get detailed information about a specific rack.
+
+**Parameters:**
+- `site_name` (string, required): Name of the site
+- `rack_name` (string, required): Name of the rack
+
+**Returns:** Detailed rack information including:
+- Rack dimensions and capacity
+- Space utilization (RU used/available)
+- Complete device inventory
+- Power and HVAC calculations
+- Device positions and specifications
+
+**Example:**
+```json
+{
+  "site_name": "Main Datacenter",
+  "rack_name": "Rack-A1"
+}
+```
+
+### 4. get_available_resources
+
+List all available device types and their specifications.
+
+**Parameters:**
+- `category` (string, optional): Filter by device category
+
+**Returns:** Grouped list of device types with:
+- Device name and ID
+- Category
+- Physical size (RU)
+- Power consumption
+- Heat output
+- Display color
+
+**Example:**
+```json
+{
+  "category": "Server"
+}
+```
+
+### 5. get_resource_summary
+
+Get overall resource utilization summary across all sites.
+
+**Parameters:** None
+
+**Returns:** System-wide summary including:
+- Total counts (sites, racks, devices)
+- Overall capacity metrics
+- Total power consumption
+- Total HVAC requirements
+- Average utilization statistics
+
+## Using with Claude
+
+### Claude Desktop Configuration
+
+Add the MCP server to your Claude Desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "racksum": {
+      "command": "python",
+      "args": [
+        "/path/to/racksum/backend/manage.py",
+        "start_mcp_server"
+      ],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "backend.settings",
+        "MCP_ENABLED": "true"
+      }
+    }
+  }
+}
+```
+
+### Example Claude Queries
+
+Once configured, you can ask Claude:
+
+- "What sites do we have and what's their power usage?"
+- "Show me the details of Rack-A1 in the Main Datacenter"
+- "What device types are available in the server category?"
+- "Give me a resource utilization summary across all sites"
+- "How much HVAC capacity do I need for my datacenters?"
+
+## Troubleshooting
+
+### MCP Server Not Starting
+
+1. **Check if MCP is enabled:**
+   ```bash
+   grep MCP_ENABLED .env
+   ```
+   Should return `MCP_ENABLED=true`
+
+2. **Verify MCP package is installed:**
+   ```bash
+   source venv/bin/activate
+   pip list | grep mcp
+   ```
+   If not installed:
+   ```bash
+   pip install mcp==1.1.2
+   ```
+
+3. **Check Django logs:**
+   Look for `[MCP]` prefixed messages in the Django startup output
+
+### No Data Returned
+
+If tools return empty results:
+
+1. **Verify database has data:**
+   ```bash
+   cd backend
+   python manage.py shell
+   ```
+   ```python
+   from api.models import Site, Rack, Device
+   print(f"Sites: {Site.objects.count()}")
+   print(f"Racks: {Rack.objects.count()}")
+   print(f"Devices: {Device.objects.count()}")
+   ```
+
+2. **Check Django admin panel:**
+   Visit `http://localhost:3000/admin` to verify data exists
+
+## Security Considerations
+
+- The MCP server runs with the same permissions as the Django application
+- It has full read access to the database
+- Currently configured for local use only (stdio transport)
+- For production use, consider:
+  - Adding authentication to MCP tools
+  - Implementing rate limiting
+  - Restricting data access based on user roles
+  - Using secure transport mechanisms
+
+## Technical Details
+
+### Architecture
+
+```
+┌─────────────┐
+│   Claude    │
+│   Desktop   │
+└──────┬──────┘
+       │ stdio
+       ▼
+┌─────────────┐
+│ MCP Server  │ (Python/asyncio)
+│  (Thread)   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│   Django    │
+│  Database   │
+└─────────────┘
+```
+
+### Implementation Files
+
+- `/backend/mcp_server.py` - Main MCP server implementation
+- `/backend/api/apps.py` - Django AppConfig with auto-start logic
+- `/backend/api/management/commands/start_mcp_server.py` - Management command
+- `/requirements.txt` - Dependencies (includes `mcp==1.1.2`)
+
+### Dependencies
+
+- **mcp**: Model Context Protocol Python SDK
+- **Django**: Web framework and ORM
+- **asyncio**: Async/await support for MCP server
+
+## Related Documentation
+
+- [API Documentation](api.md) - REST API endpoints
+- [Configuration Guide](configuration.md) - Environment variables
+- [Development Guide](development.md) - Development setup
+
+## Support
+
+For issues or questions:
+- Check the [GitHub Issues](https://github.com/DigitalVortexLLC/racksum/issues)
+- Review Django logs for error messages
+- Ensure all dependencies are installed correctly
