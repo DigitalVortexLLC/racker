@@ -6,7 +6,7 @@
   >
     <div class="rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-200 scale-100 hover:scale-[1.01]" style="background-color: var(--bg-primary);">
       <div class="flex items-center justify-between mb-6 p-6 rounded-t-xl" style="background-color: var(--color-primary);">
-        <h2 class="text-2xl font-bold" style="color: #0c0c0d;">Configuration</h2>
+        <h2 class="text-2xl font-bold" style="color: #0c0c0d;">Infrastructure Settings</h2>
         <button
           @click="$emit('close')"
           class="transition-colors"
@@ -21,23 +21,9 @@
       </div>
 
       <div class="px-6 pb-6">
-
-        <!-- Number of Racks -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
-            Number of Racks
-          </label>
-        <input
-          v-model.number="localSettings.numberOfRacks"
-          type="number"
-          min="1"
-          max="20"
-          class="w-full px-3 py-2 rounded focus:outline-none transition-colors"
-          style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);"
-          @focus="$event.target.style.borderColor = 'var(--color-primary)'; $event.target.style.boxShadow = '0 0 0 2px rgba(132, 204, 22, 0.2)'"
-            @blur="$event.target.style.borderColor = 'var(--border-color)'; $event.target.style.boxShadow = 'none'"
-          />
-        </div>
+        <p class="mb-4 text-sm" style="color: var(--text-secondary);">
+          Configure infrastructure-level settings. Use the + button to add racks.
+        </p>
 
         <!-- RU per Rack -->
         <div class="mb-4">
@@ -126,11 +112,10 @@ import { tonsToBtu, btuToTons } from '../utils/calculations'
 
 const emit = defineEmits(['close'])
 
-const { config, updateSettings, initializeRacks } = useRackConfig()
+const { config, updateSettings } = useRackConfig()
 const { showSuccess } = useToast()
 
 const localSettings = ref({
-  numberOfRacks: 1,
   ruPerRack: 42,
   totalPowerCapacity: 10000,
   hvacCapacityTons: 3
@@ -138,7 +123,6 @@ const localSettings = ref({
 
 onMounted(() => {
   localSettings.value = {
-    numberOfRacks: config.value.racks.length || 1,
     ruPerRack: config.value.settings.ruPerRack,
     totalPowerCapacity: config.value.settings.totalPowerCapacity,
     hvacCapacityTons: btuToTons(config.value.settings.hvacCapacity)
@@ -152,10 +136,7 @@ const saveSettings = () => {
     hvacCapacity: tonsToBtu(localSettings.value.hvacCapacityTons)
   })
 
-  // Update number of racks
-  initializeRacks(localSettings.value.numberOfRacks)
-
-  showSuccess('Configuration saved', 'Settings have been updated successfully')
+  showSuccess('Settings saved', 'Infrastructure settings have been updated successfully')
   emit('close')
 }
 </script>
