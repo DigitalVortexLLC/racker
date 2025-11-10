@@ -1,41 +1,79 @@
 <template>
-  <div v-if="visible" class="modal modal-open" @click.self="close">
+  <div
+    v-if="visible"
+    class="modal modal-open"
+    @click.self="close"
+  >
     <div class="modal-box w-full max-w-md">
       <div class="flex items-center justify-between mb-6 p-6 -mt-6 -mx-6 rounded-t-xl bg-primary">
-        <h2 class="text-2xl font-bold text-primary-content">{{ isRegistering ? 'Register Passkey' : 'Login with Passkey' }}</h2>
-        <button @click="close" class="btn btn-ghost btn-sm btn-circle text-primary-content">
-          <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <h2 class="text-2xl font-bold text-primary-content">
+          {{ isRegistering ? 'Register Passkey' : 'Login with Passkey' }}
+        </h2>
+        <button
+          class="btn btn-ghost btn-sm btn-circle text-primary-content"
+          @click="close"
+        >
+          <svg
+            class="size-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <div>
         <!-- Current User Display -->
-        <div v-if="currentUser" class="alert alert-success mb-4">
+        <div
+          v-if="currentUser"
+          class="alert alert-success mb-4"
+        >
           <div class="flex items-center justify-between w-full">
             <div>
-              <div class="font-medium">Welcome, {{ currentUser.username }}!</div>
-              <div class="text-sm opacity-70">{{ currentUser.email }}</div>
+              <div class="font-medium">
+                Welcome, {{ currentUser.username }}!
+              </div>
+              <div class="text-sm opacity-70">
+                {{ currentUser.email }}
+              </div>
             </div>
-            <button @click="handleLogout" class="btn btn-accent btn-sm">
+            <button
+              class="btn btn-accent btn-sm"
+              @click="handleLogout"
+            >
               Logout
             </button>
           </div>
         </div>
 
         <!-- Error Display -->
-        <div v-if="error" class="alert alert-error mb-4">
+        <div
+          v-if="error"
+          class="alert alert-error mb-4"
+        >
           <span>{{ error }}</span>
         </div>
 
         <!-- Passkey not supported warning -->
-        <div v-if="!passkeySupported" class="alert alert-warning mb-4">
+        <div
+          v-if="!passkeySupported"
+          class="alert alert-warning mb-4"
+        >
           <span>Passkeys are not supported on this device or browser. Please use a modern browser with WebAuthn support.</span>
         </div>
 
         <!-- Username Input (for registration or username-based login) -->
-        <div v-if="!currentUser" class="mb-4">
+        <div
+          v-if="!currentUser"
+          class="mb-4"
+        >
           <label class="label">
             <span class="label-text">Username</span>
           </label>
@@ -45,11 +83,14 @@
             placeholder="Enter your username"
             class="input input-bordered w-full"
             @keyup.enter="isRegistering ? handleRegister() : handleLogin()"
-          />
+          >
         </div>
 
         <!-- Passkey Name Input (for registration only) -->
-        <div v-if="!currentUser && isRegistering" class="mb-4">
+        <div
+          v-if="!currentUser && isRegistering"
+          class="mb-4"
+        >
           <label class="label">
             <span class="label-text">Passkey Name (Optional)</span>
           </label>
@@ -58,11 +99,14 @@
             type="text"
             placeholder="e.g., My MacBook, iPhone, etc."
             class="input input-bordered w-full"
-          />
+          >
         </div>
 
         <!-- Info Text -->
-        <div v-if="!currentUser" class="mb-6 text-sm opacity-70">
+        <div
+          v-if="!currentUser"
+          class="mb-6 text-sm opacity-70"
+        >
           {{ isRegistering 
             ? 'Create a new passkey for passwordless authentication. You\'ll use your device\'s biometric sensor or PIN.' 
             : 'Use your passkey to sign in securely without a password.' 
@@ -70,15 +114,18 @@
         </div>
 
         <!-- Action Buttons -->
-        <div v-if="!currentUser" class="flex flex-col gap-3">
+        <div
+          v-if="!currentUser"
+          class="flex flex-col gap-3"
+        >
           <button
             v-if="isRegistering"
-            @click="handleRegister"
             :disabled="!username.trim() || loading || !passkeySupported"
             class="btn btn-primary w-full"
+            @click="handleRegister"
           >
             <span v-if="loading">
-              <span class="loading loading-spinner loading-sm mr-2"></span>
+              <span class="loading loading-spinner loading-sm mr-2" />
               Creating Passkey...
             </span>
             <span v-else>Create Passkey</span>
@@ -86,12 +133,12 @@
 
           <button
             v-else
-            @click="handleLogin"
             :disabled="loading || !passkeySupported"
             class="btn btn-primary w-full"
+            @click="handleLogin"
           >
             <span v-if="loading">
-              <span class="loading loading-spinner loading-sm mr-2"></span>
+              <span class="loading loading-spinner loading-sm mr-2" />
               Authenticating...
             </span>
             <span v-else>Sign In with Passkey</span>
@@ -101,8 +148,8 @@
           <div class="text-center text-sm opacity-70">
             {{ isRegistering ? 'Already have a passkey?' : 'Need to create a passkey?' }}
             <button
-              @click="isRegistering = !isRegistering; error = null"
               class="link link-primary font-medium ml-1"
+              @click="isRegistering = !isRegistering; error = null"
             >
               {{ isRegistering ? 'Sign In' : 'Register' }}
             </button>

@@ -1,24 +1,57 @@
 <template>
-  <div v-if="visible" class="modal modal-open" @click.self="close">
+  <div
+    v-if="visible"
+    class="modal modal-open"
+    @click.self="close"
+  >
     <div class="modal-box w-full max-w-xl">
       <div class="flex items-center justify-between mb-6 p-6 -mt-6 -mx-6 rounded-t-xl bg-primary">
         <h2 class="text-2xl font-bold text-primary-content">
           {{ mode === 'save' ? 'Save Rack Configuration' : 'Load Rack Configuration' }}
         </h2>
-        <button @click="close" class="btn btn-ghost btn-sm btn-circle text-primary-content">
-          <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <button
+          class="btn btn-ghost btn-sm btn-circle text-primary-content"
+          @click="close"
+        >
+          <svg
+            class="size-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <div>
         <!-- Error Display -->
-        <div v-if="error" class="alert alert-error mb-4">
+        <div
+          v-if="error"
+          class="alert alert-error mb-4"
+        >
           <span>{{ error }}</span>
-          <button @click="error = null" class="btn btn-ghost btn-sm btn-circle">
-            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <button
+            class="btn btn-ghost btn-sm btn-circle"
+            @click="error = null"
+          >
+            <svg
+              class="size-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -35,22 +68,44 @@
               class="select select-bordered flex-1"
               :disabled="loading"
             >
-              <option :value="null">Select a site</option>
-              <option v-for="site in sites" :key="site.id" :value="site">
+              <option :value="null">
+                Select a site
+              </option>
+              <option
+                v-for="site in sites"
+                :key="site.id"
+                :value="site"
+              >
                 {{ site.name }}
               </option>
             </select>
 
-            <button @click="showNewSiteDialog = true" class="btn btn-square">
-              <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <button
+              class="btn btn-square"
+              @click="showNewSiteDialog = true"
+            >
+              <svg
+                class="size-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
             </button>
           </div>
         </div>
 
         <!-- Save Mode: Rack Name Input -->
-        <div v-if="mode === 'save'" class="mb-4">
+        <div
+          v-if="mode === 'save'"
+          class="mb-4"
+        >
           <label class="label">
             <span class="label-text">Rack Configuration Name</span>
           </label>
@@ -59,11 +114,14 @@
             type="text"
             placeholder="Enter configuration name (e.g., Production Rack)"
             class="input input-bordered w-full"
-          />
+          >
         </div>
 
         <!-- Save Mode: Description -->
-        <div v-if="mode === 'save'" class="mb-4">
+        <div
+          v-if="mode === 'save'"
+          class="mb-4"
+        >
           <label class="label">
             <span class="label-text">Description (Optional)</span>
           </label>
@@ -72,26 +130,38 @@
             placeholder="Enter description"
             rows="3"
             class="textarea textarea-bordered w-full resize-none"
-          ></textarea>
+          />
         </div>
 
         <!-- Load Mode: Rack Configuration Selection -->
-        <div v-if="mode === 'load' && selectedSite" class="mb-4">
+        <div
+          v-if="mode === 'load' && selectedSite"
+          class="mb-4"
+        >
           <label class="label">
             <span class="label-text">Rack Configuration</span>
           </label>
 
           <div class="border border-base-300 rounded-lg overflow-hidden">
-            <div v-if="loadingRacks" class="p-4 text-center opacity-70">
-              <span class="loading loading-spinner loading-md mr-2"></span>
+            <div
+              v-if="loadingRacks"
+              class="p-4 text-center opacity-70"
+            >
+              <span class="loading loading-spinner loading-md mr-2" />
               Loading configurations...
             </div>
 
-            <div v-else-if="!availableRacks || availableRacks.length === 0" class="p-4 text-center opacity-70">
+            <div
+              v-else-if="!availableRacks || availableRacks.length === 0"
+              class="p-4 text-center opacity-70"
+            >
               No saved configurations for this site.
             </div>
 
-            <div v-else class="divide-y divide-base-300">
+            <div
+              v-else
+              class="divide-y divide-base-300"
+            >
               <div
                 v-for="rack in availableRacks"
                 :key="rack.id"
@@ -100,8 +170,13 @@
                 @click="selectedRack = rack"
               >
                 <div class="flex-1">
-                  <div class="font-medium">{{ rack.name }}</div>
-                  <div v-if="rack.description" class="text-sm mt-1 opacity-70">
+                  <div class="font-medium">
+                    {{ rack.name }}
+                  </div>
+                  <div
+                    v-if="rack.description"
+                    class="text-sm mt-1 opacity-70"
+                  >
                     {{ rack.description }}
                   </div>
                   <div class="text-xs mt-1 opacity-70">
@@ -109,9 +184,22 @@
                   </div>
                 </div>
 
-                <button @click.stop="confirmDelete(rack)" class="btn btn-ghost btn-sm btn-square text-error">
-                  <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <button
+                  class="btn btn-ghost btn-sm btn-square text-error"
+                  @click.stop="confirmDelete(rack)"
+                >
+                  <svg
+                    class="size-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 </button>
               </div>
@@ -121,18 +209,21 @@
 
         <!-- Buttons -->
         <div class="flex gap-2 mt-6">
-          <button @click="close" class="btn flex-1">
+          <button
+            class="btn flex-1"
+            @click="close"
+          >
             Cancel
           </button>
 
           <button
             v-if="mode === 'save'"
-            @click="handleSave"
             :disabled="!canSave || saving"
             class="btn btn-primary flex-1"
+            @click="handleSave"
           >
             <span v-if="saving">
-              <span class="loading loading-spinner loading-sm mr-1"></span>
+              <span class="loading loading-spinner loading-sm mr-1" />
               Saving...
             </span>
             <span v-else>Save</span>
@@ -140,12 +231,12 @@
 
           <button
             v-if="mode === 'load'"
-            @click="handleLoad"
             :disabled="!selectedRack || loading"
             class="btn btn-primary flex-1"
+            @click="handleLoad"
           >
             <span v-if="loading">
-              <span class="loading loading-spinner loading-sm mr-1"></span>
+              <span class="loading loading-spinner loading-sm mr-1" />
               Loading...
             </span>
             <span v-else>Load</span>
@@ -156,13 +247,32 @@
   </div>
 
   <!-- New Site Dialog -->
-  <div v-if="showNewSiteDialog" class="modal modal-open" @click.self="showNewSiteDialog = false">
+  <div
+    v-if="showNewSiteDialog"
+    class="modal modal-open"
+    @click.self="showNewSiteDialog = false"
+  >
     <div class="modal-box w-full max-w-md">
       <div class="flex items-center justify-between mb-6 p-6 -mt-6 -mx-6 rounded-t-xl bg-primary">
-        <h2 class="text-2xl font-bold text-primary-content">Create New Site</h2>
-        <button @click="showNewSiteDialog = false" class="btn btn-ghost btn-sm btn-circle text-primary-content">
-          <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <h2 class="text-2xl font-bold text-primary-content">
+          Create New Site
+        </h2>
+        <button
+          class="btn btn-ghost btn-sm btn-circle text-primary-content"
+          @click="showNewSiteDialog = false"
+        >
+          <svg
+            class="size-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -177,7 +287,7 @@
             type="text"
             placeholder="Enter site name"
             class="input input-bordered w-full"
-          />
+          >
         </div>
 
         <div class="mb-4">
@@ -189,21 +299,24 @@
             placeholder="Enter description"
             rows="3"
             class="textarea textarea-bordered w-full resize-none"
-          ></textarea>
+          />
         </div>
 
         <div class="flex gap-2 mt-6">
-          <button @click="showNewSiteDialog = false" class="btn flex-1">
+          <button
+            class="btn flex-1"
+            @click="showNewSiteDialog = false"
+          >
             Cancel
           </button>
 
           <button
-            @click="handleCreateSite"
             :disabled="!newSiteName?.trim() || creating"
             class="btn btn-primary flex-1"
+            @click="handleCreateSite"
           >
             <span v-if="creating">
-              <span class="loading loading-spinner loading-sm mr-1"></span>
+              <span class="loading loading-spinner loading-sm mr-1" />
               Creating...
             </span>
             <span v-else>Create</span>

@@ -1,13 +1,13 @@
 <template>
   <div
-    @dragover.prevent="handleDragOver"
-    @dragleave="handleDragLeave"
-    @drop="handleDrop"
     :draggable="device && isFirstRU"
-    @dragstart="handleDragStart"
     :class="slotClasses"
     class="relative flex items-center border transition-colors"
     :style="slotStyle"
+    @dragover.prevent="handleDragOver"
+    @dragleave="handleDragLeave"
+    @drop="handleDrop"
+    @dragstart="handleDragStart"
   >
     <!-- Position number (only shown on first RU of device or empty slot) -->
     <div
@@ -27,11 +27,21 @@
         {{ device.customName || device.name }}
       </span>
       <button
-        @click="removeDevice"
         class="btn btn-ghost btn-xs btn-square text-white hover:text-error-content hover:bg-error/20 ml-2"
+        @click="removeDevice"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
     </div>

@@ -1,6 +1,9 @@
 <template>
   <div class="collapse collapse-arrow bg-base-200 border border-base-300">
-    <input type="checkbox" v-model="isOpen" />
+    <input
+      v-model="isOpen"
+      type="checkbox"
+    >
     <div class="collapse-title font-medium">
       {{ category.name }}
     </div>

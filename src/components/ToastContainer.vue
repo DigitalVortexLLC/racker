@@ -65,8 +65,15 @@
           />
         </svg>
         <div class="flex-1">
-          <div class="font-semibold">{{ toast.message }}</div>
-          <div v-if="toast.detail" class="text-sm opacity-90 mt-0.5">{{ toast.detail }}</div>
+          <div class="font-semibold">
+            {{ toast.message }}
+          </div>
+          <div
+            v-if="toast.detail"
+            class="text-sm opacity-90 mt-0.5"
+          >
+            {{ toast.detail }}
+          </div>
         </div>
       </div>
     </TransitionGroup>

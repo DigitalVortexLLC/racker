@@ -1,18 +1,25 @@
 <template>
   <div
     :draggable="true"
-    @dragstart="handleDragStart"
     class="p-3 cursor-move transition-colors border-b border-base-300 last:border-b-0 hover:bg-base-200"
+    @dragstart="handleDragStart"
   >
     <div class="flex items-center gap-3">
       <!-- Color indicator -->
-      <div :style="{ backgroundColor: device.color }" class="size-4 rounded flex-shrink-0"></div>
+      <div
+        :style="{ backgroundColor: device.color }"
+        class="size-4 rounded flex-shrink-0"
+      />
 
       <!-- Device info -->
       <div class="flex-1 min-w-0">
         <div class="font-medium text-sm truncate flex items-center gap-2">
           {{ device.name }}
-          <span v-if="device.custom" class="badge badge-primary badge-sm" title="Custom device">
+          <span
+            v-if="device.custom"
+            class="badge badge-primary badge-sm"
+            title="Custom device"
+          >
             Custom
           </span>
         </div>
@@ -23,7 +30,10 @@
     </div>
 
     <!-- Tooltip on hover -->
-    <div v-if="showTooltip" class="text-xs mt-2 opacity-70">
+    <div
+      v-if="showTooltip"
+      class="text-xs mt-2 opacity-70"
+    >
       {{ device.description }}
     </div>
   </div>

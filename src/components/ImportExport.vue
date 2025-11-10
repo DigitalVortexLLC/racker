@@ -1,96 +1,140 @@
 <template>
-  <div class="modal modal-open" @click.self="$emit('close')">
+  <div
+    class="modal modal-open"
+    @click.self="$emit('close')"
+  >
     <div class="modal-box w-full max-w-2xl">
       <div class="flex items-center justify-between mb-6 p-6 -mt-6 -mx-6 rounded-t-xl bg-primary">
-        <h2 class="text-2xl font-bold text-primary-content">Import / Export Configuration</h2>
-        <button @click="$emit('close')" class="btn btn-ghost btn-sm btn-circle text-primary-content">
-          <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <h2 class="text-2xl font-bold text-primary-content">
+          Import / Export Configuration
+        </h2>
+        <button
+          class="btn btn-ghost btn-sm btn-circle text-primary-content"
+          @click="$emit('close')"
+        >
+          <svg
+            class="size-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
       <div>
-
-      <!-- Tabs -->
-      <div role="tablist" class="tabs tabs-border mb-4">
-        <button
-          role="tab"
-          class="tab"
-          :class="{ 'tab-active': activeTab === 'export' }"
-          @click="activeTab = 'export'"
+        <!-- Tabs -->
+        <div
+          role="tablist"
+          class="tabs tabs-border mb-4"
         >
-          Export
-        </button>
-        <button
-          role="tab"
-          class="tab"
-          :class="{ 'tab-active': activeTab === 'import' }"
-          @click="activeTab = 'import'"
+          <button
+            role="tab"
+            class="tab"
+            :class="{ 'tab-active': activeTab === 'export' }"
+            @click="activeTab = 'export'"
+          >
+            Export
+          </button>
+          <button
+            role="tab"
+            class="tab"
+            :class="{ 'tab-active': activeTab === 'import' }"
+            @click="activeTab = 'import'"
+          >
+            Import
+          </button>
+        </div>
+
+        <!-- Export Tab -->
+        <div
+          v-if="activeTab === 'export'"
+          class="space-y-4"
         >
-          Import
-        </button>
-      </div>
-
-      <!-- Export Tab -->
-      <div v-if="activeTab === 'export'" class="space-y-4">
-        <div>
-          <label class="label">
-            <span class="label-text">Configuration JSON</span>
-          </label>
-          <textarea
-            :value="exportJson"
-            readonly
-            class="textarea textarea-bordered w-full h-64 font-mono text-xs"
-          ></textarea>
-        </div>
-        <div class="flex gap-2">
-          <button @click="copyToClipboard" class="btn btn-primary">
-            {{ copyButtonText }}
-          </button>
-          <button @click="downloadJson" class="btn btn-accent">
-            Download File
-          </button>
-        </div>
-      </div>
-
-      <!-- Import Tab -->
-      <div v-if="activeTab === 'import'" class="space-y-4">
-        <div>
-          <label class="label">
-            <span class="label-text">Paste Configuration JSON</span>
-          </label>
-          <textarea
-            v-model="importJson"
-            placeholder="Paste your configuration JSON here..."
-            class="textarea textarea-bordered w-full h-64 font-mono text-xs"
-          ></textarea>
-        </div>
-        <div class="flex gap-2">
-          <button @click="loadFromJson" class="btn btn-primary">
-            Load Configuration
-          </button>
-          <label class="btn btn-accent">
-            Upload File
-            <input
-              type="file"
-              accept=".json"
-              @change="handleFileUpload"
-              class="hidden"
+          <div>
+            <label class="label">
+              <span class="label-text">Configuration JSON</span>
+            </label>
+            <textarea
+              :value="exportJson"
+              readonly
+              class="textarea textarea-bordered w-full h-64 font-mono text-xs"
             />
-          </label>
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="btn btn-primary"
+              @click="copyToClipboard"
+            >
+              {{ copyButtonText }}
+            </button>
+            <button
+              class="btn btn-accent"
+              @click="downloadJson"
+            >
+              Download File
+            </button>
+          </div>
         </div>
-        <div v-if="importError" class="alert alert-error">
-          <span>{{ importError }}</span>
+
+        <!-- Import Tab -->
+        <div
+          v-if="activeTab === 'import'"
+          class="space-y-4"
+        >
+          <div>
+            <label class="label">
+              <span class="label-text">Paste Configuration JSON</span>
+            </label>
+            <textarea
+              v-model="importJson"
+              placeholder="Paste your configuration JSON here..."
+              class="textarea textarea-bordered w-full h-64 font-mono text-xs"
+            />
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="btn btn-primary"
+              @click="loadFromJson"
+            >
+              Load Configuration
+            </button>
+            <label class="btn btn-accent">
+              Upload File
+              <input
+                type="file"
+                accept=".json"
+                class="hidden"
+                @change="handleFileUpload"
+              >
+            </label>
+          </div>
+          <div
+            v-if="importError"
+            class="alert alert-error"
+          >
+            <span>{{ importError }}</span>
+          </div>
+          <div
+            v-if="importSuccess"
+            class="alert alert-success"
+          >
+            <span>Configuration loaded successfully!</span>
+          </div>
         </div>
-        <div v-if="importSuccess" class="alert alert-success">
-          <span>Configuration loaded successfully!</span>
-        </div>
-      </div>
 
         <!-- Close Button -->
         <div class="mt-6 flex justify-end">
-          <button @click="$emit('close')" class="btn">
+          <button
+            class="btn"
+            @click="$emit('close')"
+          >
             Close
           </button>
         </div>
