@@ -1,0 +1,50 @@
+[Unit]
+Description=RackSum - Rack Diagram Planning Tool
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+# User and group to run as (change to your deployment user)
+User=www-data
+Group=www-data
+
+# Working directory
+WorkingDirectory=/opt/racksum
+
+# Environment variables
+EnvironmentFile=/opt/racksum/.env
+
+# Virtual environment and startup command
+ExecStart=/opt/racksum/venv/bin/gunicorn \
+    --config /opt/racksum/gunicorn.conf.py \
+    --chdir /opt/racksum/backend \
+    backend.wsgi:application
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/racksum
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=racksum
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
