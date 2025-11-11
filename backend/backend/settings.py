@@ -23,7 +23,7 @@ import logging
 pymysql.install_as_MySQLdb()
 
 # Load environment variables
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent.parent / '.env')
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent.parent / ".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,7 +51,7 @@ if SENTRY_DSN:
 
     integrations = [
         DjangoIntegration(
-            transaction_style='url',
+            transaction_style="url",
             middleware_spans=True,
             signals_spans=True,
             cache_spans=True,
@@ -94,7 +94,7 @@ SECRET_KEY = "django-insecure-6a_$0w=w(9n%ud1frq7+h&unrciyy-oe_@0il-xqyj-i1$h!q5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Configure appropriately for production
+ALLOWED_HOSTS = ["*"]  # Configure appropriately for production
 
 
 # Application definition
@@ -134,7 +134,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR.parent / 'dist'],  # Vue build directory
+        "DIRS": [BASE_DIR.parent / "dist"],  # Vue build directory
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -216,7 +216,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR.parent / 'dist' / 'assets',  # Vue build assets
+    BASE_DIR.parent / "dist" / "assets",  # Vue build assets
 ]
 
 # Default primary key field type
@@ -226,16 +226,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Django REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
     ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # Allow URLs without trailing slashes
@@ -245,15 +245,15 @@ APPEND_SLASH = False
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 
 # Session settings
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 # CSRF settings
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
 CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 # MCP Server Configuration
 MCP_ENABLED = os.getenv("MCP_ENABLED", "false").lower() == "true"
@@ -261,19 +261,19 @@ MCP_PORT = int(os.getenv("MCP_PORT", "3001"))
 
 # drf-spectacular settings for OpenAPI/Swagger documentation
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'RackSum API',
-    'DESCRIPTION': 'Datacenter Rack Management API - Manage sites, racks, devices, and resource utilization with WebAuthn/Passkey authentication',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SCHEMA_PATH_PREFIX': '/api/',
-    'COMPONENT_SPLIT_REQUEST': True,
-    'TAGS': [
-        {'name': 'Sites', 'description': 'Physical datacenter site management'},
-        {'name': 'Devices', 'description': 'Device template and type management'},
-        {'name': 'Racks', 'description': 'Rack configuration and management'},
-        {'name': 'Rack Devices', 'description': 'Device placement within racks'},
-        {'name': 'Resource Usage', 'description': 'Power and HVAC resource calculations'},
-        {'name': 'Authentication', 'description': 'WebAuthn/Passkey authentication endpoints'},
-        {'name': 'Legacy', 'description': 'Legacy compatibility endpoints'},
+    "TITLE": "RackSum API",
+    "DESCRIPTION": "Datacenter Rack Management API - Manage sites, racks, devices, and resource utilization with WebAuthn/Passkey authentication",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": "/api/",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "Sites", "description": "Physical datacenter site management"},
+        {"name": "Devices", "description": "Device template and type management"},
+        {"name": "Racks", "description": "Rack configuration and management"},
+        {"name": "Rack Devices", "description": "Device placement within racks"},
+        {"name": "Resource Usage", "description": "Power and HVAC resource calculations"},
+        {"name": "Authentication", "description": "WebAuthn/Passkey authentication endpoints"},
+        {"name": "Legacy", "description": "Legacy compatibility endpoints"},
     ],
 }
