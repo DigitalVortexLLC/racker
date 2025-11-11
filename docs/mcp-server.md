@@ -54,13 +54,14 @@ python manage.py start_mcp_server
 
 ## Available Tools
 
-The MCP server provides the following tools:
+The MCP server provides the following tools with support for both text and JSON output formats:
 
 ### 1. get_site_stats
 
 Get statistics for all sites in the system.
 
-**Parameters:** None
+**Parameters:**
+- `output_format` (string, optional): Output format - "text" (default, human-readable) or "json" (structured data)
 
 **Returns:** List of all sites with:
 - Number of racks
@@ -68,7 +69,7 @@ Get statistics for all sites in the system.
 - Power consumption (W/kW)
 - HVAC load (BTU/hr, tons)
 
-**Example Output:**
+**Example Text Output:**
 ```
 === SITE STATISTICS ===
 
@@ -78,6 +79,25 @@ Get statistics for all sites in the system.
    Total Power: 12,450 W (12.45 kW)
    Total HVAC Load: 42,454 BTU/hr (3.54 tons)
    Created: 2025-01-15 10:30
+```
+
+**Example JSON Output:**
+```json
+{
+  "sites": [
+    {
+      "name": "Main Datacenter",
+      "description": "",
+      "racks_count": 5,
+      "devices_count": 47,
+      "power_watts": 12450.0,
+      "power_kw": 12.45,
+      "hvac_btu_hr": 42454.0,
+      "hvac_tons": 3.54,
+      "created_at": "2025-01-15T10:30:00"
+    }
+  ]
+}
 ```
 
 ### 2. get_site_details
@@ -128,7 +148,8 @@ Get detailed information about a specific rack.
 List all available device types and their specifications.
 
 **Parameters:**
-- `category` (string, optional): Filter by device category
+- `category` (string, optional): Filter by device category (case-insensitive)
+- `limit` (integer, optional): Maximum number of devices to return (useful for large device catalogs)
 
 **Returns:** Grouped list of device types with:
 - Device name and ID
@@ -137,11 +158,13 @@ List all available device types and their specifications.
 - Power consumption
 - Heat output
 - Display color
+- Pagination info if results were limited
 
 **Example:**
 ```json
 {
-  "category": "Server"
+  "category": "Server",
+  "limit": 10
 }
 ```
 
@@ -157,6 +180,27 @@ Get overall resource utilization summary across all sites.
 - Total power consumption
 - Total HVAC requirements
 - Average utilization statistics
+
+## Features
+
+### Performance Optimizations
+- **Efficient Database Queries**: Uses Django's `prefetch_related()` to eliminate N+1 query problems
+- **Optimized for Scale**: Can handle large datacenters with hundreds of racks and thousands of devices
+
+### User-Friendly Design
+- **Case-Insensitive Lookups**: Site and rack names are matched case-insensitively for better user experience
+- **Pagination Support**: Optional limit parameter for device listings to handle large catalogs
+- **Comprehensive Error Handling**: Detailed error messages and logging for troubleshooting
+
+### Output Formats
+- **Text Format (Default)**: Human-readable output with emoji and formatting
+- **JSON Format**: Structured data perfect for programmatic use and API integrations
+- **Flexible Parameter**: All tools support `output_format` parameter ("text" or "json")
+- **Backward Compatible**: Defaults to text format when parameter is omitted
+
+### Configurable Constants
+- **WATTS_TO_BTU**: Configurable conversion factor (default: 3.412) for power-to-heat calculations
+- **BTU_PER_TON**: Configurable HVAC constant (default: 12,000) for cooling capacity calculations
 
 ## Using with Claude
 
@@ -187,10 +231,20 @@ Add the MCP server to your Claude Desktop configuration:
 Once configured, you can ask Claude:
 
 - "What sites do we have and what's their power usage?"
-- "Show me the details of Rack-A1 in the Main Datacenter"
+- "Show me the details of Rack-A1 in the Main Datacenter" (case-insensitive)
+- "Show me details for rack-a1 in the main datacenter" (works with any case)
 - "What device types are available in the server category?"
+- "List the first 10 network devices" (uses pagination)
 - "Give me a resource utilization summary across all sites"
 - "How much HVAC capacity do I need for my datacenters?"
+
+**JSON Output Examples:**
+
+- "Get site statistics in JSON format"
+- "Show me rack details for Rack-A1 in JSON"
+- "Give me device types as structured JSON data"
+
+The MCP server will automatically detect requests for JSON format or you can explicitly pass `output_format: "json"` parameter.
 
 ## Troubleshooting
 
@@ -270,10 +324,65 @@ If tools return empty results:
 
 ### Implementation Files
 
-- `/backend/mcp_server.py` - Main MCP server implementation
+The MCP server uses a modular architecture for better maintainability:
+
+- `/backend/mcp/` - MCP server package directory
+  - `server.py` - Main server entry point and request router
+  - `tools.py` - Tool definitions and schemas
+  - `handlers.py` - Tool handler implementations
+  - `formatters.py` - Output formatting helper functions
+- `/backend/mcp_server.py` - Backward compatibility wrapper
 - `/backend/api/apps.py` - Django AppConfig with auto-start logic
 - `/backend/api/management/commands/start_mcp_server.py` - Management command
 - `/requirements.txt` - Dependencies (includes `mcp==1.1.2`)
+
+**Modular Design Benefits:**
+- **Separation of Concerns**: Each module has a single, well-defined responsibility
+- **Testability**: Individual modules can be tested in isolation
+- **Maintainability**: Changes to one aspect (e.g., formatting) don't affect others
+- **Reusability**: Formatters and utilities can be reused across handlers
+- **Readability**: Smaller, focused files are easier to understand and navigate
+
+### Testing
+
+The MCP server includes comprehensive test coverage:
+
+- `/backend/mcp/tests/` - Test suite directory
+  - `test_formatters.py` - Tests for formatting functions (18 tests)
+  - `test_tools.py` - Tests for tool definitions (15 tests)
+  - `test_handlers.py` - Tests for handler implementations (22 tests)
+- `/backend/pytest.ini` - Pytest configuration
+
+**Running Tests:**
+
+```bash
+# Run all MCP tests
+cd backend
+pytest mcp/tests/ -v
+
+# Run with coverage
+pytest mcp/tests/ -v --cov=mcp --cov-report=term-missing
+
+# Run specific test file
+pytest mcp/tests/test_formatters.py -v
+
+# Run specific test
+pytest mcp/tests/test_formatters.py::TestFormatters::test_format_power_basic -v
+```
+
+**Test Coverage:**
+- 55+ test cases covering all MCP functionality
+- Unit tests for formatters (pure functions)
+- Integration tests for handlers (database operations)
+- Parametrized tests for edge cases
+- Async test support with pytest-asyncio
+- Tests run automatically in CI/CD pipeline
+
+**Continuous Integration:**
+- Tests run on every push and pull request
+- Tested against Python 3.10, 3.11, and 3.12
+- MySQL database integration tests
+- Code coverage reporting
 
 ### Dependencies
 
