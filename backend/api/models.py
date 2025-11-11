@@ -6,7 +6,7 @@ import uuid
 User = get_user_model()
 
 
-class Provider(models.Model):
+class HardwareProvider(models.Model):
     """
     Represents a hardware/equipment provider
     """
@@ -17,7 +17,7 @@ class Provider(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'providers'
+        db_table = 'hardware_providers'
         ordering = ['name']
 
     def __str__(self):
@@ -49,7 +49,7 @@ class Device(models.Model):
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=100, db_index=True)
     provider = models.ForeignKey(
-        Provider,
+        HardwareProvider,
         on_delete=models.SET_NULL,
         related_name='devices',
         db_column='provider_id',
@@ -287,7 +287,7 @@ class Provider(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'providers'
+        db_table = 'resource_providers'
         ordering = ['site', 'type', 'name']
         indexes = [
             models.Index(fields=['site']),
