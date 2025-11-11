@@ -54,13 +54,14 @@ python manage.py start_mcp_server
 
 ## Available Tools
 
-The MCP server provides the following tools:
+The MCP server provides the following tools with support for both text and JSON output formats:
 
 ### 1. get_site_stats
 
 Get statistics for all sites in the system.
 
-**Parameters:** None
+**Parameters:**
+- `output_format` (string, optional): Output format - "text" (default, human-readable) or "json" (structured data)
 
 **Returns:** List of all sites with:
 - Number of racks
@@ -68,7 +69,7 @@ Get statistics for all sites in the system.
 - Power consumption (W/kW)
 - HVAC load (BTU/hr, tons)
 
-**Example Output:**
+**Example Text Output:**
 ```
 === SITE STATISTICS ===
 
@@ -78,6 +79,25 @@ Get statistics for all sites in the system.
    Total Power: 12,450 W (12.45 kW)
    Total HVAC Load: 42,454 BTU/hr (3.54 tons)
    Created: 2025-01-15 10:30
+```
+
+**Example JSON Output:**
+```json
+{
+  "sites": [
+    {
+      "name": "Main Datacenter",
+      "description": "",
+      "racks_count": 5,
+      "devices_count": 47,
+      "power_watts": 12450.0,
+      "power_kw": 12.45,
+      "hvac_btu_hr": 42454.0,
+      "hvac_tons": 3.54,
+      "created_at": "2025-01-15T10:30:00"
+    }
+  ]
+}
 ```
 
 ### 2. get_site_details
@@ -172,6 +192,12 @@ Get overall resource utilization summary across all sites.
 - **Pagination Support**: Optional limit parameter for device listings to handle large catalogs
 - **Comprehensive Error Handling**: Detailed error messages and logging for troubleshooting
 
+### Output Formats
+- **Text Format (Default)**: Human-readable output with emoji and formatting
+- **JSON Format**: Structured data perfect for programmatic use and API integrations
+- **Flexible Parameter**: All tools support `output_format` parameter ("text" or "json")
+- **Backward Compatible**: Defaults to text format when parameter is omitted
+
 ### Configurable Constants
 - **WATTS_TO_BTU**: Configurable conversion factor (default: 3.412) for power-to-heat calculations
 - **BTU_PER_TON**: Configurable HVAC constant (default: 12,000) for cooling capacity calculations
@@ -211,6 +237,14 @@ Once configured, you can ask Claude:
 - "List the first 10 network devices" (uses pagination)
 - "Give me a resource utilization summary across all sites"
 - "How much HVAC capacity do I need for my datacenters?"
+
+**JSON Output Examples:**
+
+- "Get site statistics in JSON format"
+- "Show me rack details for Rack-A1 in JSON"
+- "Give me device types as structured JSON data"
+
+The MCP server will automatically detect requests for JSON format or you can explicitly pass `output_format: "json"` parameter.
 
 ## Troubleshooting
 

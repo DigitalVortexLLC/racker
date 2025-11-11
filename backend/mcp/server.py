@@ -42,29 +42,32 @@ async def list_tools():
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Route tool calls to appropriate handlers"""
 
+    # Extract output_format, default to "text" for backward compatibility
+    output_format = arguments.get("output_format", "text")
+
     if name == "get_site_stats":
-        return await handlers.get_site_stats()
+        return await handlers.get_site_stats(output_format)
 
     elif name == "get_site_details":
         site_name = arguments.get("site_name")
         if not site_name:
             return [TextContent(type="text", text="Error: site_name is required")]
-        return await handlers.get_site_details(site_name)
+        return await handlers.get_site_details(site_name, output_format)
 
     elif name == "get_rack_details":
         site_name = arguments.get("site_name")
         rack_name = arguments.get("rack_name")
         if not site_name or not rack_name:
             return [TextContent(type="text", text="Error: site_name and rack_name are required")]
-        return await handlers.get_rack_details(site_name, rack_name)
+        return await handlers.get_rack_details(site_name, rack_name, output_format)
 
     elif name == "get_available_resources":
         category = arguments.get("category")
         limit = arguments.get("limit")
-        return await handlers.get_available_resources(category, limit)
+        return await handlers.get_available_resources(category, limit, output_format)
 
     elif name == "get_resource_summary":
-        return await handlers.get_resource_summary()
+        return await handlers.get_resource_summary(output_format)
 
     else:
         return [TextContent(type="text", text=f"Unknown tool: {name}")]

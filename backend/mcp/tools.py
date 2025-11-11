@@ -12,7 +12,14 @@ def get_tool_definitions() -> list[Tool]:
             description="Get statistics for all sites including rack count, device count, and resource usage",
             inputSchema={
                 "type": "object",
-                "properties": {},
+                "properties": {
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format: 'text' (default, human-readable) or 'json' (structured data)",
+                        "default": "text"
+                    }
+                },
                 "required": []
             }
         ),
@@ -25,6 +32,12 @@ def get_tool_definitions() -> list[Tool]:
                     "site_name": {
                         "type": "string",
                         "description": "Name of the site to get details for"
+                    },
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format: 'text' (default, human-readable) or 'json' (structured data)",
+                        "default": "text"
                     }
                 },
                 "required": ["site_name"]
@@ -43,6 +56,12 @@ def get_tool_definitions() -> list[Tool]:
                     "rack_name": {
                         "type": "string",
                         "description": "Name of the rack to get details for"
+                    },
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format: 'text' (default, human-readable) or 'json' (structured data)",
+                        "default": "text"
                     }
                 },
                 "required": ["site_name", "rack_name"]
@@ -61,6 +80,12 @@ def get_tool_definitions() -> list[Tool]:
                     "limit": {
                         "type": "integer",
                         "description": "Maximum number of devices to return (optional, default: no limit)"
+                    },
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format: 'text' (default, human-readable) or 'json' (structured data)",
+                        "default": "text"
                     }
                 }
             }
@@ -70,7 +95,14 @@ def get_tool_definitions() -> list[Tool]:
             description="Get overall resource utilization summary across all sites",
             inputSchema={
                 "type": "object",
-                "properties": {},
+                "properties": {
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format: 'text' (default, human-readable) or 'json' (structured data)",
+                        "default": "text"
+                    }
+                },
                 "required": []
             }
         )

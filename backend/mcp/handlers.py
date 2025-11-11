@@ -8,16 +8,17 @@ from mcp.types import TextContent
 
 from api.models import Site, Rack, Device, RackDevice
 from .formatters import format_power, format_hvac, format_space_utilization, calculate_heat_output
+from . import json_formatters
 
 logger = logging.getLogger(__name__)
 
 
-async def get_site_stats() -> list[TextContent]:
+async def get_site_stats(output_format: str = "text") -> list[TextContent]:
     """Get statistics for all sites"""
     @sync_to_async
     def get_stats():
         try:
-            logger.info("Fetching site statistics")
+            logger.info(f"Fetching site statistics (format: {output_format})")
             # Use prefetch_related to avoid N+1 queries
             sites = list(Site.objects.prefetch_related(
                 'racks__rack_devices__device'
@@ -25,8 +26,14 @@ async def get_site_stats() -> list[TextContent]:
 
             if not sites:
                 logger.info("No sites found in database")
+                if output_format == "json":
+                    return json_formatters.format_site_stats_json([])
                 return "No sites found in the database."
 
+            if output_format == "json":
+                return json_formatters.format_site_stats_json(sites)
+
+            # Text format
             stats = []
             stats.append("=== SITE STATISTICS ===\n")
 
@@ -56,12 +63,12 @@ async def get_site_stats() -> list[TextContent]:
     return [TextContent(type="text", text=result)]
 
 
-async def get_site_details(site_name: str) -> list[TextContent]:
+async def get_site_details(site_name: str, output_format: str = "text") -> list[TextContent]:
     """Get detailed information about a specific site"""
     @sync_to_async
     def get_details():
         try:
-            logger.info(f"Fetching details for site: {site_name}")
+            logger.info(f"Fetching details for site: {site_name} (format: {output_format})")
             # Use prefetch_related to avoid N+1 queries
             # Use case-insensitive lookup for better user experience
             site = Site.objects.prefetch_related(
@@ -75,6 +82,10 @@ async def get_site_details(site_name: str) -> list[TextContent]:
             return f"Error retrieving site details: {str(e)}"
 
         try:
+            if output_format == "json":
+                return json_formatters.format_site_details_json(site)
+
+            # Text format
             details = []
             details.append(f"=== SITE DETAILS: {site.name} ===\n")
 
@@ -115,12 +126,12 @@ async def get_site_details(site_name: str) -> list[TextContent]:
     return [TextContent(type="text", text=result)]
 
 
-async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
+async def get_rack_details(site_name: str, rack_name: str, output_format: str = "text") -> list[TextContent]:
     """Get detailed information about a specific rack"""
     @sync_to_async
     def get_details():
         try:
-            logger.info(f"Fetching rack details: {site_name}/{rack_name}")
+            logger.info(f"Fetching rack details: {site_name}/{rack_name} (format: {output_format})")
             # Use case-insensitive lookups for better user experience
             site = Site.objects.get(name__iexact=site_name)
             rack = Rack.objects.prefetch_related(
@@ -137,6 +148,10 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
             return f"Error retrieving rack details: {str(e)}"
 
         try:
+            if output_format == "json":
+                return json_formatters.format_rack_details_json(site, rack)
+
+            # Text format
             details = []
             details.append(f"=== RACK DETAILS: {site.name} - {rack.name} ===\n")
 
@@ -183,12 +198,12 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
     return [TextContent(type="text", text=result)]
 
 
-async def get_available_resources(category: Optional[str] = None, limit: Optional[int] = None) -> list[TextContent]:
+async def get_available_resources(category: Optional[str] = None, limit: Optional[int] = None, output_format: str = "text") -> list[TextContent]:
     """Get information about available device types"""
     @sync_to_async
     def get_resources():
         try:
-            logger.info(f"Fetching available resources{f' for category: {category}' if category else ''}{f' (limit: {limit})' if limit else ''}")
+            logger.info(f"Fetching available resources{f' for category: {category}' if category else ''}{f' (limit: {limit})' if limit else ''} (format: {output_format})")
             devices = Device.objects.all()
 
             if category:
@@ -203,8 +218,14 @@ async def get_available_resources(category: Optional[str] = None, limit: Optiona
             if not devices_list:
                 msg = f"No devices found" + (f" in category '{category}'" if category else "")
                 logger.info(msg)
+                if output_format == "json":
+                    return json_formatters.format_available_resources_json([])
                 return msg + "."
 
+            if output_format == "json":
+                return json_formatters.format_available_resources_json(devices_list)
+
+            # Text format
             details = []
             details.append("=== AVAILABLE DEVICE TYPES ===\n")
 
@@ -242,20 +263,28 @@ async def get_available_resources(category: Optional[str] = None, limit: Optiona
     return [TextContent(type="text", text=result)]
 
 
-async def get_resource_summary() -> list[TextContent]:
+async def get_resource_summary(output_format: str = "text") -> list[TextContent]:
     """Get overall resource utilization summary"""
     @sync_to_async
     def get_summary():
         try:
-            logger.info("Fetching resource summary")
+            logger.info(f"Fetching resource summary (format: {output_format})")
             sites = list(Site.objects.all())
 
             if not sites:
                 logger.info("No sites found in database")
+                if output_format == "json":
+                    return json_formatters.format_resource_summary_json([], None, {
+                        "total_sites": 0,
+                        "total_racks": 0,
+                        "total_rack_devices": 0,
+                        "total_device_types": 0,
+                        "total_ru_capacity": 0,
+                        "total_ru_used": 0,
+                        "overall_power": 0,
+                        "overall_hvac": 0
+                    })
                 return "No sites found in the database."
-
-            summary = []
-            summary.append("=== RESOURCE UTILIZATION SUMMARY ===\n")
 
             total_sites = len(sites)
             total_racks = Rack.objects.count()
@@ -275,6 +304,24 @@ async def get_resource_summary() -> list[TextContent]:
                 overall_hvac += rack.get_hvac_load()
                 total_ru_capacity += rack.ru_height
                 total_ru_used += sum(device.device.ru_size for device in rack.rack_devices.all())
+
+            stats = {
+                "total_sites": total_sites,
+                "total_racks": total_racks,
+                "total_rack_devices": total_rack_devices,
+                "total_device_types": total_device_types,
+                "total_ru_capacity": total_ru_capacity,
+                "total_ru_used": total_ru_used,
+                "overall_power": overall_power,
+                "overall_hvac": overall_hvac
+            }
+
+            if output_format == "json":
+                return json_formatters.format_resource_summary_json(sites, racks, stats)
+
+            # Text format
+            summary = []
+            summary.append("=== RESOURCE UTILIZATION SUMMARY ===\n")
 
             summary.append(f"Total Sites: {total_sites}")
             summary.append(f"Total Racks: {total_racks}")
