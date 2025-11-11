@@ -290,10 +290,24 @@ If tools return empty results:
 
 ### Implementation Files
 
-- `/backend/mcp_server.py` - Main MCP server implementation
+The MCP server uses a modular architecture for better maintainability:
+
+- `/backend/mcp/` - MCP server package directory
+  - `server.py` - Main server entry point and request router
+  - `tools.py` - Tool definitions and schemas
+  - `handlers.py` - Tool handler implementations
+  - `formatters.py` - Output formatting helper functions
+- `/backend/mcp_server.py` - Backward compatibility wrapper
 - `/backend/api/apps.py` - Django AppConfig with auto-start logic
 - `/backend/api/management/commands/start_mcp_server.py` - Management command
 - `/requirements.txt` - Dependencies (includes `mcp==1.1.2`)
+
+**Modular Design Benefits:**
+- **Separation of Concerns**: Each module has a single, well-defined responsibility
+- **Testability**: Individual modules can be tested in isolation
+- **Maintainability**: Changes to one aspect (e.g., formatting) don't affect others
+- **Reusability**: Formatters and utilities can be reused across handlers
+- **Readability**: Smaller, focused files are easier to understand and navigate
 
 ### Dependencies
 
