@@ -128,7 +128,8 @@ Get detailed information about a specific rack.
 List all available device types and their specifications.
 
 **Parameters:**
-- `category` (string, optional): Filter by device category
+- `category` (string, optional): Filter by device category (case-insensitive)
+- `limit` (integer, optional): Maximum number of devices to return (useful for large device catalogs)
 
 **Returns:** Grouped list of device types with:
 - Device name and ID
@@ -137,11 +138,13 @@ List all available device types and their specifications.
 - Power consumption
 - Heat output
 - Display color
+- Pagination info if results were limited
 
 **Example:**
 ```json
 {
-  "category": "Server"
+  "category": "Server",
+  "limit": 10
 }
 ```
 
@@ -157,6 +160,21 @@ Get overall resource utilization summary across all sites.
 - Total power consumption
 - Total HVAC requirements
 - Average utilization statistics
+
+## Features
+
+### Performance Optimizations
+- **Efficient Database Queries**: Uses Django's `prefetch_related()` to eliminate N+1 query problems
+- **Optimized for Scale**: Can handle large datacenters with hundreds of racks and thousands of devices
+
+### User-Friendly Design
+- **Case-Insensitive Lookups**: Site and rack names are matched case-insensitively for better user experience
+- **Pagination Support**: Optional limit parameter for device listings to handle large catalogs
+- **Comprehensive Error Handling**: Detailed error messages and logging for troubleshooting
+
+### Configurable Constants
+- **WATTS_TO_BTU**: Configurable conversion factor (default: 3.412) for power-to-heat calculations
+- **BTU_PER_TON**: Configurable HVAC constant (default: 12,000) for cooling capacity calculations
 
 ## Using with Claude
 
@@ -187,8 +205,10 @@ Add the MCP server to your Claude Desktop configuration:
 Once configured, you can ask Claude:
 
 - "What sites do we have and what's their power usage?"
-- "Show me the details of Rack-A1 in the Main Datacenter"
+- "Show me the details of Rack-A1 in the Main Datacenter" (case-insensitive)
+- "Show me details for rack-a1 in the main datacenter" (works with any case)
 - "What device types are available in the server category?"
+- "List the first 10 network devices" (uses pagination)
 - "Give me a resource utilization summary across all sites"
 - "How much HVAC capacity do I need for my datacenters?"
 

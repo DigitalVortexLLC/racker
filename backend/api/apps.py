@@ -31,7 +31,7 @@ class ApiConfig(AppConfig):
             )
             thread.start()
 
-            print(f"[MCP] Server starting in background on port {settings.MCP_PORT}...")
+            print("[MCP] Server starting in background (stdio mode)...")
             print("[MCP] Use 'python manage.py start_mcp_server' to run in foreground")
 
     def _start_mcp_server(self):

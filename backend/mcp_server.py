@@ -6,6 +6,7 @@ import sys
 import django
 import asyncio
 import logging
+from typing import Optional
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 from mcp.server.stdio import stdio_server
@@ -25,6 +26,28 @@ logging.basicConfig(
     level=logging.INFO,
     format='[MCP] %(asctime)s - %(levelname)s - %(message)s'
 )
+
+
+# Helper functions to reduce code duplication
+def format_power(watts: float) -> str:
+    """Format power consumption in watts and kilowatts"""
+    return f"{watts:,.0f} W ({watts/1000:.2f} kW)"
+
+
+def format_hvac(btu_hr: float) -> str:
+    """Format HVAC load in BTU/hr and tons"""
+    return f"{btu_hr:,.0f} BTU/hr ({btu_hr/settings.BTU_PER_TON:.2f} tons)"
+
+
+def format_space_utilization(used: int, total: int) -> str:
+    """Format rack space utilization"""
+    percentage = (used/total*100) if total > 0 else 0
+    return f"{used}U / {total}U ({percentage:.1f}%)"
+
+
+def calculate_heat_output(power_watts: float) -> float:
+    """Calculate heat output in BTU/hr from power consumption in watts"""
+    return power_watts * settings.WATTS_TO_BTU
 
 
 # Create MCP server instance
@@ -85,6 +108,10 @@ async def list_tools() -> list[Tool]:
                     "category": {
                         "type": "string",
                         "description": "Filter devices by category (optional)"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of devices to return (optional, default: no limit)"
                     }
                 }
             }
@@ -120,7 +147,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return await get_rack_details(site_name, rack_name)
     elif name == "get_available_resources":
         category = arguments.get("category")
-        return await get_available_resources(category)
+        limit = arguments.get("limit")
+        return await get_available_resources(category, limit)
     elif name == "get_resource_summary":
         return await get_resource_summary()
     else:
@@ -157,8 +185,8 @@ async def get_site_stats() -> list[TextContent]:
                     stats.append(f"   Description: {site.description}")
                 stats.append(f"   Racks: {total_racks}")
                 stats.append(f"   Devices: {total_devices}")
-                stats.append(f"   Total Power: {total_power:,.0f} W ({total_power/1000:.2f} kW)")
-                stats.append(f"   Total HVAC Load: {total_hvac:,.0f} BTU/hr ({total_hvac/settings.BTU_PER_TON:.2f} tons)")
+                stats.append(f"   Total Power: {format_power(total_power)}")
+                stats.append(f"   Total HVAC Load: {format_hvac(total_hvac)}")
                 stats.append(f"   Created: {site.created_at.strftime('%Y-%m-%d %H:%M')}")
 
             logger.info(f"Successfully retrieved stats for {len(sites)} sites")
@@ -178,9 +206,10 @@ async def get_site_details(site_name: str) -> list[TextContent]:
         try:
             logger.info(f"Fetching details for site: {site_name}")
             # Use prefetch_related to avoid N+1 queries
+            # Use case-insensitive lookup for better user experience
             site = Site.objects.prefetch_related(
                 'racks__rack_devices__device'
-            ).get(name=site_name)
+            ).get(name__iexact=site_name)
         except Site.DoesNotExist:
             logger.warning(f"Site not found: {site_name}")
             return f"Site '{site_name}' not found."
@@ -213,11 +242,11 @@ async def get_site_details(site_name: str) -> list[TextContent]:
                     if rack.description:
                         details.append(f"   Description: {rack.description}")
                     details.append(f"   Height: {rack.ru_height}U")
-                    details.append(f"   Space Used: {ru_used}U / {rack.ru_height}U ({(ru_used/rack.ru_height*100):.1f}%)")
+                    details.append(f"   Space Used: {format_space_utilization(ru_used, rack.ru_height)}")
                     details.append(f"   Available: {ru_available}U")
                     details.append(f"   Devices: {len(devices)}")
-                    details.append(f"   Power: {power:,.0f} W ({power/1000:.2f} kW)")
-                    details.append(f"   HVAC Load: {hvac:,.0f} BTU/hr")
+                    details.append(f"   Power: {format_power(power)}")
+                    details.append(f"   HVAC Load: {format_hvac(hvac)}")
 
             logger.info(f"Successfully retrieved details for site: {site_name}")
             return "\n".join(details)
@@ -235,10 +264,11 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
     def get_details():
         try:
             logger.info(f"Fetching rack details: {site_name}/{rack_name}")
-            site = Site.objects.get(name=site_name)
+            # Use case-insensitive lookups for better user experience
+            site = Site.objects.get(name__iexact=site_name)
             rack = Rack.objects.prefetch_related(
                 'rack_devices__device'
-            ).get(site=site, name=rack_name)
+            ).get(site=site, name__iexact=rack_name)
         except Site.DoesNotExist:
             logger.warning(f"Site not found: {site_name}")
             return f"Site '{site_name}' not found."
@@ -265,10 +295,10 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
             power = rack.get_power_utilization()
             hvac = rack.get_hvac_load()
 
-            details.append(f"Space Used: {ru_used}U / {rack.ru_height}U ({(ru_used/rack.ru_height*100):.1f}%)")
+            details.append(f"Space Used: {format_space_utilization(ru_used, rack.ru_height)}")
             details.append(f"Space Available: {ru_available}U")
-            details.append(f"Total Power: {power:,.0f} W ({power/1000:.2f} kW)")
-            details.append(f"HVAC Load: {hvac:,.0f} BTU/hr ({hvac/settings.BTU_PER_TON:.2f} tons)\n")
+            details.append(f"Total Power: {format_power(power)}")
+            details.append(f"HVAC Load: {format_hvac(hvac)}\n")
 
             if devices:
                 details.append("--- DEVICES ---")
@@ -282,7 +312,7 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
                     details.append(f"   Position: RU {rack_device.position}")
                     details.append(f"   Size: {device.ru_size}U")
                     details.append(f"   Power: {device.power_draw} W")
-                    details.append(f"   Heat: {device.power_draw * settings.WATTS_TO_BTU:.0f} BTU/hr")
+                    details.append(f"   Heat: {calculate_heat_output(device.power_draw):.0f} BTU/hr")
             else:
                 details.append("No devices installed in this rack.")
 
@@ -296,16 +326,20 @@ async def get_rack_details(site_name: str, rack_name: str) -> list[TextContent]:
     return [TextContent(type="text", text=result)]
 
 
-async def get_available_resources(category: str = None) -> list[TextContent]:
+async def get_available_resources(category: Optional[str] = None, limit: Optional[int] = None) -> list[TextContent]:
     """Get information about available device types"""
     @sync_to_async
     def get_resources():
         try:
-            logger.info(f"Fetching available resources{f' for category: {category}' if category else ''}")
+            logger.info(f"Fetching available resources{f' for category: {category}' if category else ''}{f' (limit: {limit})' if limit else ''}")
             devices = Device.objects.all()
 
             if category:
                 devices = devices.filter(category__icontains=category)
+
+            # Apply limit if specified
+            if limit and limit > 0:
+                devices = devices[:limit]
 
             devices_list = list(devices)
 
@@ -332,10 +366,14 @@ async def get_available_resources(category: str = None) -> list[TextContent]:
                         details.append(f"     Description: {device.description}")
                     details.append(f"     Size: {device.ru_size}U")
                     details.append(f"     Power: {device.power_draw} W")
-                    details.append(f"     Heat: {device.power_draw * settings.WATTS_TO_BTU:.0f} BTU/hr")
+                    details.append(f"     Heat: {calculate_heat_output(device.power_draw):.0f} BTU/hr")
                     details.append(f"     Color: {device.color}")
 
-            details.append(f"\n\nTotal device types: {len(devices_list)}")
+            details.append(f"\n\nTotal device types shown: {len(devices_list)}")
+            if limit and limit > 0:
+                total_count = Device.objects.filter(category__icontains=category).count() if category else Device.objects.count()
+                if total_count > len(devices_list):
+                    details.append(f"(Showing first {len(devices_list)} of {total_count} total devices)")
 
             logger.info(f"Successfully retrieved {len(devices_list)} device types")
             return "\n".join(details)
@@ -394,12 +432,12 @@ async def get_resource_summary() -> list[TextContent]:
                 summary.append(f"Utilization: {(total_ru_used/total_ru_capacity*100):.1f}%\n")
 
             summary.append("--- POWER & COOLING ---")
-            summary.append(f"Total Power Draw: {overall_power:,.0f} W ({overall_power/1000:.2f} kW)")
-            summary.append(f"Total HVAC Load: {overall_hvac:,.0f} BTU/hr ({overall_hvac/settings.BTU_PER_TON:.2f} tons)")
+            summary.append(f"Total Power Draw: {format_power(overall_power)}")
+            summary.append(f"Total HVAC Load: {format_hvac(overall_hvac)}")
 
             if total_racks > 0:
                 avg_power_per_rack = overall_power / total_racks
-                summary.append(f"\nAverage per Rack: {avg_power_per_rack:,.0f} W ({avg_power_per_rack/1000:.2f} kW)")
+                summary.append(f"\nAverage per Rack: {format_power(avg_power_per_rack)}")
 
             logger.info(f"Successfully retrieved resource summary: {total_sites} sites, {total_racks} racks")
             return "\n".join(summary)
