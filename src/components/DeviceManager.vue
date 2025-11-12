@@ -1271,12 +1271,9 @@
             type="number"
             min="0"
             max="42"
-            placeholder="0 = not racked"
+            placeholder="0"
             class="input input-bordered w-full"
           >
-          <label class="label">
-            <span class="label-text-alt">If this provider requires rack space, it will appear in Unracked Devices. Set to 0 for wall-mounted or external providers.</span>
-          </label>
         </div>
 
         <div class="mb-4">

@@ -54,18 +54,19 @@ urlpatterns = [
     path("api/", include("api.urls")),
 ]
 
+# Serve Vue assets from /assets/ path (must come before catch-all)
+urlpatterns += [
+    re_path(
+        r"^assets/(?P<path>.*)$",
+        serve,
+        {
+            "document_root": settings.BASE_DIR.parent / "dist" / "assets",
+        },
+    ),
+]
+
 # Serve static files in development
 if settings.DEBUG:
-    # Serve Vue assets from /assets/ path
-    urlpatterns += [
-        re_path(
-            r"^assets/(?P<path>.*)$",
-            serve,
-            {
-                "document_root": settings.BASE_DIR.parent / "dist" / "assets",
-            },
-        ),
-    ]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Serve Vue app for all other routes (must be last)
