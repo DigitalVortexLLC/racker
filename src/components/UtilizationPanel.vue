@@ -39,7 +39,14 @@
       <!-- Power Utilization -->
       <div class="mb-4">
         <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-medium">Power</span>
+          <div class="flex items-center gap-2">
+            <span
+              class="status status-sm"
+              :class="powerStatusColor"
+              aria-label="power status"
+            />
+            <span class="text-sm font-medium">Power</span>
+          </div>
           <span class="text-sm opacity-70">{{ powerUsed }}W / {{ powerCapacity }}W</span>
         </div>
         <progress
@@ -59,7 +66,14 @@
         class="mb-4"
       >
         <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-medium">Power Ports</span>
+          <div class="flex items-center gap-2">
+            <span
+              class="status status-sm"
+              :class="powerPortsStatusColor"
+              aria-label="power ports status"
+            />
+            <span class="text-sm font-medium">Power Ports</span>
+          </div>
           <span class="text-sm opacity-70">{{ powerPortsUsed }} / {{ powerPortsCapacity }} ports</span>
         </div>
         <progress
@@ -76,7 +90,14 @@
       <!-- HVAC Utilization -->
       <div class="mb-4">
         <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-medium">HVAC</span>
+          <div class="flex items-center gap-2">
+            <span
+              class="status status-sm"
+              :class="hvacStatusColor"
+              aria-label="hvac status"
+            />
+            <span class="text-sm font-medium">HVAC</span>
+          </div>
           <span class="text-sm opacity-70">{{ hvacLoadTons }} / {{ hvacCapacityTons }} Tons</span>
         </div>
         <progress
@@ -93,7 +114,14 @@
       <!-- RU Utilization -->
       <div>
         <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-medium">Rack Units</span>
+          <div class="flex items-center gap-2">
+            <span
+              class="status status-sm"
+              :class="ruStatusColor"
+              aria-label="rack units status"
+            />
+            <span class="text-sm font-medium">Rack Units</span>
+          </div>
           <span class="text-sm opacity-70">{{ ruUsed }}U / {{ ruCapacity }}U</span>
         </div>
         <progress
@@ -126,7 +154,7 @@
       <!-- Power Compact -->
       <div
         class="tooltip tooltip-left"
-        data-tip="Power"
+        :data-tip="`Power: ${powerUsed}W / ${powerCapacity}W`"
       >
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
@@ -141,9 +169,10 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <div
-              class="size-2 rounded-full"
-              :class="powerBarColor"
+            <span
+              class="status status-sm"
+              :class="powerStatusColor"
+              aria-label="power status"
             />
           </div>
           <span class="text-sm font-medium">{{ powerPercentage }}%</span>
@@ -154,7 +183,7 @@
       <div
         v-if="powerPortsCapacity > 0"
         class="tooltip tooltip-left"
-        data-tip="Power Ports"
+        :data-tip="`Power Ports: ${powerPortsUsed} / ${powerPortsCapacity}`"
       >
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
@@ -169,9 +198,10 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <div
-              class="size-2 rounded-full"
-              :class="powerPortsBarColor"
+            <span
+              class="status status-sm"
+              :class="powerPortsStatusColor"
+              aria-label="power ports status"
             />
           </div>
           <span class="text-sm font-medium">{{ powerPortsPercentage }}%</span>
@@ -181,7 +211,7 @@
       <!-- HVAC Compact -->
       <div
         class="tooltip tooltip-left"
-        data-tip="HVAC"
+        :data-tip="`HVAC: ${hvacLoadTons} / ${hvacCapacityTons} Tons`"
       >
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
@@ -196,9 +226,10 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <div
-              class="size-2 rounded-full"
-              :class="hvacBarColor"
+            <span
+              class="status status-sm"
+              :class="hvacStatusColor"
+              aria-label="hvac status"
             />
           </div>
           <span class="text-sm font-medium">{{ hvacPercentage }}%</span>
@@ -208,7 +239,7 @@
       <!-- RU Compact -->
       <div
         class="tooltip tooltip-left"
-        data-tip="Rack Units"
+        :data-tip="`Rack Units: ${ruUsed}U / ${ruCapacity}U`"
       >
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
@@ -219,9 +250,10 @@
             >
               <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 16a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" />
             </svg>
-            <div
-              class="size-2 rounded-full"
-              :class="ruBarColor"
+            <span
+              class="status status-sm"
+              :class="ruStatusColor"
+              aria-label="rack units status"
             />
           </div>
           <span class="text-sm font-medium">{{ ruPercentage }}%</span>
@@ -275,8 +307,19 @@ const getBarColor = (percentage) => {
   return 'progress-error'
 }
 
+const getStatusColor = (percentage) => {
+  if (percentage < 70) return 'status-success'
+  if (percentage < 90) return 'status-warning'
+  return 'status-error'
+}
+
 const powerBarColor = computed(() => getBarColor(powerPercentage.value))
 const powerPortsBarColor = computed(() => getBarColor(powerPortsPercentage.value))
 const hvacBarColor = computed(() => getBarColor(hvacPercentage.value))
 const ruBarColor = computed(() => getBarColor(ruPercentage.value))
+
+const powerStatusColor = computed(() => getStatusColor(powerPercentage.value))
+const powerPortsStatusColor = computed(() => getStatusColor(powerPortsPercentage.value))
+const hvacStatusColor = computed(() => getStatusColor(hvacPercentage.value))
+const ruStatusColor = computed(() => getStatusColor(ruPercentage.value))
 </script>
