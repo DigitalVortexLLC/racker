@@ -1420,15 +1420,61 @@ onMounted(() => {
   loadCustomDevices();
 });
 
-function loadDeviceGroups() {
+async function loadDeviceGroups() {
+  // Load groups from both API (database) and localStorage, then merge them
+  const localGroups = [];
+  const apiGroups = [];
+
+  // Load from localStorage
   const saved = localStorage.getItem('racker-device-groups');
   if (saved) {
     try {
-      deviceGroups.value = JSON.parse(saved);
+      localGroups.push(...JSON.parse(saved));
     } catch (err) {
-      logError('Error loading device groups', err);
+      logError('Error loading device groups from localStorage', err);
     }
   }
+
+  // Load from API (database)
+  try {
+    const response = await fetch('/api/device-groups');
+    if (response.ok) {
+      const groups = await response.json();
+      apiGroups.push(...groups);
+    }
+  } catch (err) {
+    logWarn('Could not load device groups from API', err);
+  }
+
+  // Merge groups: combine both sources, avoiding duplicates by name
+  const mergedGroups = [];
+  const seenNames = new Set();
+
+  // Add API groups first (they have priority)
+  for (const group of apiGroups) {
+    const normalizedName = group.name.toLowerCase();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      // Convert API format to local format
+      mergedGroups.push({
+        id: `api-${group.id}`,
+        name: group.name,
+        color: '#4A90E2', // Default color for API groups
+        deviceCount: group.device_count || 0
+      });
+    }
+  }
+
+  // Add localStorage groups that don't conflict
+  for (const group of localGroups) {
+    const normalizedName = group.name.toLowerCase();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      mergedGroups.push(group);
+    }
+  }
+
+  deviceGroups.value = mergedGroups;
 }
 
 function loadCustomDevices() {
