@@ -13,7 +13,7 @@ from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
-from .models import Site, RackConfiguration, Device, Rack, RackDevice, Provider
+from .models import Site, RackConfiguration, Device, Rack, RackDevice, Provider, DeviceGroup
 from .serializers import (
     SiteSerializer,
     RackConfigurationSerializer,
@@ -24,6 +24,7 @@ from .serializers import (
     RackDeviceCreateSerializer,
     ProviderSerializer,
     ProviderCreateSerializer,
+    DeviceGroupSerializer,
 )
 from .validation_schemas import get_all_schemas
 
@@ -795,6 +796,80 @@ class ProviderViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Create provider with validation"""
         serializer.save()
+
+
+# ==================== Device Group Management Endpoints ====================
+
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="List all device groups",
+        description="Retrieve a list of all device groups/categories",
+        tags=["Device Groups"],
+    ),
+    retrieve=extend_schema(
+        summary="Get device group details",
+        description="Retrieve details of a specific device group by ID",
+        tags=["Device Groups"],
+    ),
+    create=extend_schema(
+        summary="Create a new device group",
+        description="Create a new device group/category for organizing devices",
+        tags=["Device Groups"],
+        examples=[
+            OpenApiExample(
+                "Device group creation example",
+                value={"name": "Switches", "description": "Network switches"},
+                request_only=True,
+            )
+        ],
+    ),
+    update=extend_schema(
+        summary="Update a device group", description="Update an existing device group", tags=["Device Groups"]
+    ),
+    partial_update=extend_schema(
+        summary="Partially update a device group",
+        description="Partially update an existing device group",
+        tags=["Device Groups"],
+    ),
+    destroy=extend_schema(
+        summary="Delete a device group",
+        description="Delete a device group from the database",
+        tags=["Device Groups"],
+    ),
+)
+class DeviceGroupViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for DeviceGroup CRUD operations
+    """
+
+    queryset = DeviceGroup.objects.all()
+    serializer_class = DeviceGroupSerializer
+    permission_classes = [AllowAny]
+
+    @method_decorator(cache_page(60 * 10))  # Cache for 10 minutes
+    def list(self, request, *args, **kwargs):
+        """List all device groups with caching"""
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new device group
+        """
+        name = request.data.get("name")
+
+        if not name or not isinstance(name, str) or not name.strip():
+            return Response({"error": "Device group name is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            device_group = DeviceGroup.objects.create(
+                name=name.strip(), description=request.data.get("description", "")
+            )
+            return Response(DeviceGroupSerializer(device_group).data, status=status.HTTP_201_CREATED)
+        except IntegrityError:
+            return Response(
+                {"error": "A device group with this name already exists"}, status=status.HTTP_409_CONFLICT
+            )
 
 
 @extend_schema(

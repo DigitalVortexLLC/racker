@@ -26,7 +26,7 @@ export function useDevices() {
 
       // Load default devices
       const defaultCategories = devicesData.categories || []
-      
+
       // Load custom device groups from localStorage
       const savedGroups = localStorage.getItem('racker-device-groups')
       let customGroups = []
@@ -36,6 +36,28 @@ export function useDevices() {
         } catch (err) {
           logError('Error loading custom device groups', err)
         }
+      }
+
+      // Load device groups from API (database)
+      try {
+        const apiResponse = await fetch('/api/device-groups')
+        if (apiResponse.ok) {
+          const apiGroups = await apiResponse.json()
+          // Add API groups to customGroups if they don't already exist
+          for (const apiGroup of apiGroups) {
+            const exists = customGroups.some(g => g.name.toLowerCase() === apiGroup.name.toLowerCase())
+            if (!exists) {
+              customGroups.push({
+                id: `api-${apiGroup.id}`,
+                name: apiGroup.name,
+                color: '#4A90E2', // Default color for API groups
+                deviceCount: apiGroup.device_count || 0
+              })
+            }
+          }
+        }
+      } catch (err) {
+        logWarn('Could not load device groups from API', err)
       }
 
       // Load custom devices from localStorage

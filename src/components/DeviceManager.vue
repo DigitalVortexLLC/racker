@@ -1274,6 +1274,9 @@
             placeholder="0"
             class="input input-bordered w-full"
           >
+          <label class="label">
+            <span class="label-text-alt">Set to 1 or more to allow dragging into racks. 0 means not rackable.</span>
+          </label>
         </div>
 
         <div class="mb-4">
@@ -1420,15 +1423,61 @@ onMounted(() => {
   loadCustomDevices();
 });
 
-function loadDeviceGroups() {
+async function loadDeviceGroups() {
+  // Load groups from both API (database) and localStorage, then merge them
+  const localGroups = [];
+  const apiGroups = [];
+
+  // Load from localStorage
   const saved = localStorage.getItem('racker-device-groups');
   if (saved) {
     try {
-      deviceGroups.value = JSON.parse(saved);
+      localGroups.push(...JSON.parse(saved));
     } catch (err) {
-      logError('Error loading device groups', err);
+      logError('Error loading device groups from localStorage', err);
     }
   }
+
+  // Load from API (database)
+  try {
+    const response = await fetch('/api/device-groups');
+    if (response.ok) {
+      const groups = await response.json();
+      apiGroups.push(...groups);
+    }
+  } catch (err) {
+    logWarn('Could not load device groups from API', err);
+  }
+
+  // Merge groups: combine both sources, avoiding duplicates by name
+  const mergedGroups = [];
+  const seenNames = new Set();
+
+  // Add API groups first (they have priority)
+  for (const group of apiGroups) {
+    const normalizedName = group.name.toLowerCase();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      // Convert API format to local format
+      mergedGroups.push({
+        id: `api-${group.id}`,
+        name: group.name,
+        color: '#4A90E2', // Default color for API groups
+        deviceCount: group.device_count || 0
+      });
+    }
+  }
+
+  // Add localStorage groups that don't conflict
+  for (const group of localGroups) {
+    const normalizedName = group.name.toLowerCase();
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      mergedGroups.push(group);
+    }
+  }
+
+  deviceGroups.value = mergedGroups;
 }
 
 function loadCustomDevices() {
@@ -1695,7 +1744,8 @@ function closeProviderDialog() {
     coolingCapacityTons: 0,
     networkCapacity: 0,
     location: '',
-    description: ''
+    description: '',
+    ruSize: 0
   };
 }
 
@@ -1709,7 +1759,8 @@ function editProvider(provider) {
     coolingCapacityTons: provider.coolingCapacity ? provider.coolingCapacity / 12000 : 0,
     networkCapacity: provider.networkCapacity || 0,
     location: provider.location || '',
-    description: provider.description || ''
+    description: provider.description || '',
+    ruSize: provider.ruSize || 0
   };
   addProviderDialog.value?.showModal();
 }
@@ -1721,10 +1772,12 @@ function handleSaveProvider() {
     name: newProvider.value.name.trim(),
     type: newProvider.value.type,
     powerCapacity: newProvider.value.type === 'power' ? newProvider.value.powerCapacity : 0,
+    powerPortsCapacity: newProvider.value.type === 'power' ? newProvider.value.powerPortsCapacity : 0,
     coolingCapacity: newProvider.value.type === 'cooling' ? newProvider.value.coolingCapacityTons * 12000 : 0,
     networkCapacity: newProvider.value.type === 'network' ? newProvider.value.networkCapacity : 0,
     location: newProvider.value.location?.trim() || '',
-    description: newProvider.value.description?.trim() || ''
+    description: newProvider.value.description?.trim() || '',
+    ruSize: newProvider.value.ruSize || 0
   };
 
   if (editingProvider.value) {

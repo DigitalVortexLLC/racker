@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import models
-from .models import Site, RackConfiguration, Device, Rack, RackDevice, Provider
+from .models import Site, RackConfiguration, Device, Rack, RackDevice, Provider, DeviceGroup, HardwareProvider
 from .validation_schemas import (
     validate_hex_color,
     validate_non_empty_string,
@@ -281,3 +281,20 @@ class ProviderCreateSerializer(serializers.ModelSerializer):
         )
 
         return data
+
+
+class DeviceGroupSerializer(serializers.ModelSerializer):
+    """
+    Serializer for DeviceGroup model
+    """
+
+    device_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DeviceGroup
+        fields = ["id", "name", "description", "device_count", "created_at", "updated_at"]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+    def get_device_count(self, obj):
+        """Get count of devices in this group"""
+        return obj.devices.count()

@@ -239,6 +239,7 @@
 import { ref, computed } from 'vue'
 import { useDevices } from '../composables/useDevices'
 import { useResourceProviders } from '../composables/useResourceProviders'
+import { useDragDrop } from '../composables/useDragDrop'
 import DeviceCategory from './DeviceCategory.vue'
 
 defineEmits(['open-device-manager'])
@@ -249,6 +250,9 @@ const providerSearchQuery = ref('')
 
 // Devices
 const { categories } = useDevices()
+
+// Drag and drop
+const { startDrag } = useDragDrop()
 
 const filteredCategories = computed(() => {
   if (!deviceSearchQuery.value) return categories.value
