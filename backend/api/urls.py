@@ -7,6 +7,7 @@ from . import passkey_views
 router = DefaultRouter(trailing_slash=False)
 router.register(r"sites", views.SiteViewSet, basename="site")
 router.register(r"devices", views.DeviceViewSet, basename="device")
+router.register(r"device-groups", views.DeviceGroupViewSet, basename="device-group")
 router.register(r"racks", views.RackViewSet, basename="rack")
 router.register(r"providers", views.ProviderViewSet, basename="provider")
 
